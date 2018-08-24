@@ -1,0 +1,95 @@
+{% include 'core.views/libs/TimeUtils.Script.Txt' %}
+
+Integer GetPoints(Integer index) {
+   declare PointsPartition = {{points}};
+
+   if (PointsPartition.existskey(index))  {
+      return PointsPartition[index];
+   }
+   
+   return 1;
+}
+
+Void UpdateWidget() {
+    declare Integer[Text] RaceTimes for InputPlayer = Integer[Text];
+    (Page.GetFirstChild("Widget") as CMlFrame).Show();
+
+    declare Boolean isPlayerInScores = False;
+    declare Boolean hasPlayerScore = False;
+
+    Page.GetClassChildren ("PlayerItem", Page.MainFrame, True);
+    declare CTmMlPlayer[Text] PlayersByLogin = CTmMlPlayer[Text];
+    foreach (Player in Players) {
+        PlayersByLogin[Player.User.Login] <=> Player;
+    }
+
+    foreach (key => Item in Page.GetClassChildren_Result) {
+        declare Frame <=> (Item as CMlFrame);
+        if (Scores.existskey(key)) {
+            Frame.Show();
+            declare Color = <0., 0., 0.>;
+            declare Text Fame = "";
+            declare Text Status = "";
+            declare Text Login = Scores[key].User.Login;
+
+            if (Login == InputPlayer.User.Login) {
+                Color = <0.3, 0.85, .1>;
+                isPlayerInScores = True;
+            }
+            declare Integer Time = 0;
+            if (RaceTimes.existskey(Login)) {
+              Time = RaceTimes[Login];
+            }
+            (Frame.Controls[0] as CMlLabel).Value = (key + 1) ^ ". " ^ Scores[key].User.Name;
+            (Frame.Controls[1] as CMlLabel).Value = TimeToText(Time);
+            (Frame.Controls[2] as CMlLabel).Value = " $fff" ^ Scores[key].Points ^ "  $0d0+" ^ GetPoints(key);
+        } else {
+            Frame.Hide();
+        }
+    }
+    (Page.GetFirstChild("MyScore") as CMlFrame).Hide();
+
+     if (isPlayerInScores == False && hasPlayerScore == False) {
+        foreach (key => Score in Scores) {
+          if (Score.User.Login == InputPlayer.User.Login) {
+              hasPlayerScore = True;
+              declare Frame <=> (Page.GetFirstChild("MyScore") as CMlFrame);
+              Frame.Show();
+              (Frame.Controls[0] as CMlLabel).Value = (key + 1) ^ ". " ^ Score.User.Name;
+              (Frame.Controls[1] as CMlLabel).Value = TimeToText(Score.TempResult.Time);
+              (Frame.Controls[2] as CMlLabel).Value = " $fff" ^ Score.Points ^ "  $0d0+" ^ GetPoints(key);
+           return;
+          }
+       }
+    }
+
+}
+
+***OnInit***
+***
+declare Integer[Text] RaceTimes for InputPlayer = Integer[Text];
+
+***
+
+
+***Loop***
+***
+
+foreach (Event in RaceEvents) {
+  if (Event.IsEndRace) {
+      RaceTimes[Event.Player.User.Login] = Event.RaceTime;
+      UpdateWidget();
+  }
+
+  if (GUIPlayer != Null) {
+      if ( GUIPlayer.RaceState == CTmMlPlayer::ERaceState::BeforeStart) {
+         (Page.GetFirstChild("Widget") as CMlFrame).Hide();
+          RaceTimes.clear();
+      }
+      if ( GUIPlayer.RaceState == CTmMlPlayer::ERaceState::Running) {
+         (Page.GetFirstChild("Widget") as CMlFrame).Hide();
+      }
+  }
+}
+
+***
