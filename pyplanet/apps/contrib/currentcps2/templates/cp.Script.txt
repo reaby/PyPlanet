@@ -1,0 +1,88 @@
+#Include "TextLib" as TextLib
+#Include "MathLib" as MathLib
+
+***OnInit***
+***
+    declare Integer recordsAmount for Page;
+    recordsAmount = {{ records_amount }};
+    Update();
+***
+
+
+***Loop***
+***
+    foreach (event in RaceEvents) {
+       if (event.Type == CTmRaceClientEvent::EType::WayPoint) {
+           Update();
+       }
+    }
+***
+
+Text FormatSec(Real sec) {
+    if (sec > 10.) return TextLib::FormatReal(sec,3,False,False);
+    return  0 ^ TextLib::FormatReal(sec,3,False,False);
+}
+
+Text TimeToText(Integer intime) {
+    declare time = MathLib::Abs(intime);
+    declare Integer cent = time % 1000;
+    declare Integer sec2 = (time / 1000) % 60;
+    declare Real sec = 1. * sec2 + cent * 0.001;
+    declare Integer min = (time / 60000) % 60;
+    declare Integer hour = time / 3600000;
+    declare Text sign = "";
+    if (intime < 0) sign = "-";
+    if (hour > 0) return sign ^ hour ^ "'" ^ TextLib::FormatInteger(min,2) ^ ":" ^ FormatSec(sec);
+    if (min == 0) return sign ^ "00:" ^ FormatSec(sec);
+    if (min > 10)  return sign ^ min ^ ":" ^ FormatSec(sec);
+    return sign ^ 0 ^ min ^ ":" ^ FormatSec(sec);
+}
+
+CTmMlPlayer getPlayer(Text Login) {
+    foreach (Player in Players) {
+        if (Player.User.Login == Login) {
+           return Player;
+        }
+    }
+    return CTmMlPlayer;
+}
+
+Void updatePlayerSlot(Integer x, CTmMlPlayer Player) {
+  declare Integer recordsAmount for Page;
+    if (x > recordsAmount-1) {
+      return;
+    }
+
+    declare frame <=> (Page.GetFirstChild("pos_"^x) as CMlFrame);
+    (frame.Controls[1] as CMlLabel).Value = ""^Player.CurRace.Checkpoints.count;
+    (frame.Controls[3] as CMlLabel).Value = Player.User.Name;
+    (frame.Controls[5] as CMlLabel).Value = TimeToText(Player.CurRace.Time);
+}
+
+
+Void Update() {
+    declare Integer recordsAmount for Page;
+    declare x = 0;
+
+    foreach (Score in Scores) {
+         if (x > recordsAmount-1) {
+          return;
+         }
+         updatePlayerSlot(x, getPlayer(Score.User.Login));
+         x += 1;
+    }
+}
+
+main() {
+  +++OnInit+++
+
+  while (True) {
+      yield;
+
+      if (!PageIsVisible || InputPlayer == Null) {
+  	  		continue;
+      }
+
+      +++Loop+++
+  }
+}
