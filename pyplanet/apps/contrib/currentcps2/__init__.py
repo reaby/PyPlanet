@@ -15,7 +15,7 @@ class CurrentCPs(AppConfig):
 
 		self.widget = None
 
-	async def on_start(self):
+	async def on_start(self, *args, **kwargs):
 		# Listen to some signals
 		self.context.signals.listen(mp_signals.player.player_connect, self.player_connect)
 		self.context.signals.listen(mp_signals.map.map_begin, self.map_begin)
@@ -33,8 +33,8 @@ class CurrentCPs(AppConfig):
 	async def player_connect(self, player, *args, **kwargs):
 		await self.widget.display(player)
 
-	async def map_begin(self):
+	async def map_begin(self, *args, **kwargs):
 		await self.widget.display()
 
-	async def podium_start(self):
+	async def podium_start(self, *args, **kwargs):
 		await self.widget.hide()

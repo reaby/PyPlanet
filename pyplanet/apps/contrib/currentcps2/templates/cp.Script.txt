@@ -3,20 +3,92 @@
 
 ***OnInit***
 ***
+    declare Boolean needUpdate = False;
+    declare Integer lastUpdate = Now;
+    declare Integer oldPlayersCount = Players.count;
     declare Integer recordsAmount for Page;
+    declare Integer[Text] TimesByLogin;
+    declare Integer[Text][Integer] LoginsByCheckpoints;
+
+    declare Integer[Text] Progress;
+    declare Text[] SortedLogins;
+
     recordsAmount = {{ records_amount }};
-    Update();
+    Reset();
 ***
 
 
 ***Loop***
 ***
+    foreach (Event in PendingEvents) {
+        if (Event.Type == CMlScriptEvent::Type::MouseClick && Event.Control.HasClass("toggleSpec")) {
+            declare x = TextLib::ToInteger(Event.Control.DataAttributeGet("position"));
+            if (Players.existskey(x)) {
+                if (!InputPlayer.RequestsSpectate) {
+                   RequestSpectatorClient(True);
+                }
+                SetSpectateTarget(Players[x].User.Login);
+            }
+        }
+    }
+
+
     foreach (event in RaceEvents) {
        if (event.Type == CTmRaceClientEvent::EType::WayPoint) {
-           Update();
+          Times[event.Player.User.Login] = event.RaceTime;
+          Progress[event.Player.User.Login] = event.CheckpointInRace;
+          Nicknames[event.Player.User.Login] = event.Player.User.Name;
+          Times.sort();
+          SortedLogins.clear();
+          foreach (login => time in Times) {
+            SortedLogins.add(login);
+          }
+          needUpdate = True;
        }
     }
+
+    if (oldPlayersCount != Players.count) {
+        oldPlayersCount = Players.count;
+        needUpdate = True;
+    }
+
+   if (Now - lastUpdate > 250) {
+      lastUpdate = Now;
+      if (needUpdate == True) {
+          needUpdate = False;
+
+          for(x, 0, recordsAmount-1) {
+
+          // begin update widget
+
+              declare frame <=> (Page.GetFirstChild("pos_"^index) as CMlFrame);
+              frame.Show();
+              (frame.Controls[1] as CMlLabel).Value = ""^Progress[login];
+              (frame.Controls[3] as CMlLabel).Value = Nicknames[Login];
+              (frame.Controls[5] as CMlLabel).Value = TimeToText(time);
+              } else {
+                  declare frame <=> (Page.GetFirstChild("pos_"^x) as CMlFrame);
+                  frame.Hide();
+              }
+              index += 1;
+          }
+      }
+   }
+}
+
+
+
+
 ***
+Void Reset() {
+    declare Integer[Text] Times for Page;
+    declare Integer[Text] Progress for Page;
+    declare Text[Text] Nicknames for Page;
+
+    Times.clear();
+    Progress.clear();
+    Nicknames.clear();
+}
 
 Text FormatSec(Real sec) {
     if (sec > 10.) return TextLib::FormatReal(sec,3,False,False);
@@ -38,42 +110,9 @@ Text TimeToText(Integer intime) {
     return sign ^ 0 ^ min ^ ":" ^ FormatSec(sec);
 }
 
-CTmMlPlayer getPlayer(Text Login) {
-    foreach (Player in Players) {
-        if (Player.User.Login == Login) {
-           return Player;
-        }
-    }
-    return CTmMlPlayer;
-}
-
-Void updatePlayerSlot(Integer x, CTmMlPlayer Player) {
-  declare Integer recordsAmount for Page;
-    if (x > recordsAmount-1) {
-      return;
-    }
-
-    declare frame <=> (Page.GetFirstChild("pos_"^x) as CMlFrame);
-    (frame.Controls[1] as CMlLabel).Value = ""^Player.CurRace.Checkpoints.count;
-    (frame.Controls[3] as CMlLabel).Value = Player.User.Name;
-    (frame.Controls[5] as CMlLabel).Value = TimeToText(Player.CurRace.Time);
-}
-
-
-Void Update() {
-    declare Integer recordsAmount for Page;
-    declare x = 0;
-
-    foreach (Score in Scores) {
-         if (x > recordsAmount-1) {
-          return;
-         }
-         updatePlayerSlot(x, getPlayer(Score.User.Login));
-         x += 1;
-    }
-}
-
 main() {
+  wait (InputPlayer != Null);
+
   +++OnInit+++
 
   while (True) {
