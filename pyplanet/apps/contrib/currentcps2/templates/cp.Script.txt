@@ -4,8 +4,8 @@
 ***OnInit***
 ***
     declare oldSequence = CUIConfig::EUISequence::None;
-    declare Boolean needUpdate = False;
-    declare Integer lastUpdate = Now;
+    declare Boolean needUpdate = True;
+    declare Integer lastUpdate = Now - 250;
     declare Integer oldPlayersCount = Players.count;
     declare Integer recordsAmount;
     declare Integer[Text][Integer] Progress;  
@@ -20,6 +20,21 @@
     }    
     Progress.clear();
     NickNames.clear();
+
+    foreach (player in Players) {
+        declare CTmResult race <=> player.CurRace;
+        declare checkpoint = race.Checkpoints.count-1;    
+        if (checkpoint >= 0) {
+            if (!Progress.existskey(checkpoint)) {                
+                    Progress[checkpoint] = Integer[Text];                                
+            }          
+            if (race.Checkpoints[checkpoint] > 0) {  
+                Progress[checkpoint][player.User.Login] = race.Checkpoints[checkpoint];
+            }
+        }   
+
+        NickNames[player.User.Login] = TextLib::RegexReplace("\\$[lh]\\[.+\\]|\\$[lh]",player.User.Name,"g","");
+    }
 ***
 
 
@@ -34,20 +49,18 @@ if (oldSequence != UI.UISequence) {
            for (i, 0, recordsAmount-1) {             
                 (Page.GetFirstChild("pos_"^i) as CMlFrame).Hide();                
             }   
-    }
-    
+    }   
 }
     foreach (Event in PendingEvents) {
-        if (Event.Type == CMlScriptEvent::Type::MouseClick && Event.Control.HasClass("toggleSpec")) {
-            declare x = TextLib::ToInteger(Event.Control.DataAttributeGet("position"));
-            if (Players.existskey(x)) {
-                if (!InputPlayer.RequestsSpectate) {
-                   RequestSpectatorClient(True);
-                }
-                SetSpectateTarget(Players[x].User.Login);
+        if (Event.Type == CMlScriptEvent::Type::MouseClick && Event.Control.HasClass("toggleSpec")) {     
+            if (InputPlayer.RequestsSpectate) {
+                declare x = TextLib::ToInteger(Event.Control.DataAttributeGet("position"));
+                declare frame <=> (Page.GetFirstChild("pos_"^x) as CMlFrame);                            
+                SetSpectateTarget(frame.DataAttributeGet("login"));
             }
         }
     }
+    
 
 
     foreach (event in RaceEvents) {
@@ -69,7 +82,7 @@ if (oldSequence != UI.UISequence) {
                // remove duplicates                
                 Progress[event.CheckpointInRace][event.Player.User.Login] = event.RaceTime;             
            }                       
-            NickNames[event.Player.User.Login] = event.Player.User.Name;       
+            NickNames[event.Player.User.Login] = TextLib::RegexReplace("\\$[lh]\\[.+\\]|\\$[lh]",event.Player.User.Name,"g","");
             needUpdate = True;
         }
     }
@@ -84,7 +97,7 @@ if (oldSequence != UI.UISequence) {
       fps.Value = "fps "^frames;
 
         if (needUpdate == True) {
-            needUpdate = False;       
+            needUpdate = False;                
             declare x = 0;
             Progress = Progress.sortkeyreverse();            
             for (i, 0, recordsAmount-1) {             
@@ -98,6 +111,7 @@ if (oldSequence != UI.UISequence) {
                 foreach (login => time in timeArray) {
                     if (x > recordsAmount-1) break;
                     declare frame <=> (Page.GetFirstChild("pos_"^x) as CMlFrame);
+                    frame.DataAttributeSet("login", login);
                     frame.Show();                    
                     (frame.Controls[1] as CMlLabel).Value = ""^(cp + 1);
                     (frame.Controls[3] as CMlLabel).Value = NickNames[login];
@@ -132,11 +146,9 @@ Text TimeToText(Integer intime) {
     return sign ^ 0 ^ min ^ ":" ^ FormatSec(sec);
 }
 
-main() {
-  declare Integer LastTick = Now;
-  declare Integer TickCounter = 0;
-  
-  wait (InputPlayer != Null);
+main() {  
+  wait (InputPlayer != Null);  
+  yield;
 
   +++OnInit+++
 
