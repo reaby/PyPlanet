@@ -3,23 +3,40 @@
 
 ***OnInit***
 ***
+    declare oldSequence = CUIConfig::EUISequence::None;
     declare Boolean needUpdate = False;
     declare Integer lastUpdate = Now;
     declare Integer oldPlayersCount = Players.count;
-    declare Integer recordsAmount for Page;
-    declare Integer[Text] TimesByLogin;
-    declare Integer[Text][Integer] LoginsByCheckpoints;
-
-    declare Integer[Text] Progress;
-    declare Text[] SortedLogins;
+    declare Integer recordsAmount;
+    declare Integer[Text][Integer] Progress;  
+    declare Text[Text] NickNames;
+    declare fps <=> (Page.GetFirstChild("fps") as CMlLabel);
+    declare Real frames = 0.;
 
     recordsAmount = {{ records_amount }};
-    Reset();
+    
+    for (i, 0, recordsAmount-1) {             
+        (Page.GetFirstChild("pos_"^i) as CMlFrame).Hide();                
+    }    
+    Progress.clear();
+    NickNames.clear();
 ***
 
 
 ***Loop***
 ***
+
+if (oldSequence != UI.UISequence) {
+    oldSequence = UI.UISequence;
+    if (UI.UISequence == CUIConfig::EUISequence::EndRound) {
+           Progress.clear();
+           NickNames.clear();
+           for (i, 0, recordsAmount-1) {             
+                (Page.GetFirstChild("pos_"^i) as CMlFrame).Hide();                
+            }   
+    }
+    
+}
     foreach (Event in PendingEvents) {
         if (Event.Type == CMlScriptEvent::Type::MouseClick && Event.Control.HasClass("toggleSpec")) {
             declare x = TextLib::ToInteger(Event.Control.DataAttributeGet("position"));
@@ -34,17 +51,27 @@
 
 
     foreach (event in RaceEvents) {
+        if (event.Type == CTmRaceClientEvent::EType::Respawn) {
+            needUpdate = True;
+        }
+
        if (event.Type == CTmRaceClientEvent::EType::WayPoint) {
-          Times[event.Player.User.Login] = event.RaceTime;
-          Progress[event.Player.User.Login] = event.CheckpointInRace;
-          Nicknames[event.Player.User.Login] = event.Player.User.Name;
-          Times.sort();
-          SortedLogins.clear();
-          foreach (login => time in Times) {
-            SortedLogins.add(login);
-          }
-          needUpdate = True;
-       }
+            foreach (cp => playerTime in Progress ) {                    
+                if (Progress[cp].existskey(event.Player.User.Login)) {
+                    Progress[cp].removekey(event.Player.User.Login);
+                }   
+            }             
+
+           if (!Progress.existskey(event.CheckpointInRace)) {
+                Progress[event.CheckpointInRace] = Integer[Text];
+                Progress[event.CheckpointInRace][event.Player.User.Login] = event.RaceTime;
+           } else {
+               // remove duplicates                
+                Progress[event.CheckpointInRace][event.Player.User.Login] = event.RaceTime;             
+           }                       
+            NickNames[event.Player.User.Login] = event.Player.User.Name;       
+            needUpdate = True;
+        }
     }
 
     if (oldPlayersCount != Players.count) {
@@ -54,41 +81,36 @@
 
    if (Now - lastUpdate > 250) {
       lastUpdate = Now;
-      if (needUpdate == True) {
-          needUpdate = False;
+      fps.Value = "fps "^frames;
 
-          for(x, 0, recordsAmount-1) {
+        if (needUpdate == True) {
+            needUpdate = False;       
+            declare x = 0;
+            Progress = Progress.sortkeyreverse();            
+            for (i, 0, recordsAmount-1) {             
+                (Page.GetFirstChild("pos_"^i) as CMlFrame).Hide();                
+            }
+            foreach (cp => playerTime in Progress) {                            
+                if (playerTime.count < 0) continue;
+                if (x > recordsAmount-1) break;
+                declare timeArray = playerTime.sort();
 
-          // begin update widget
+                foreach (login => time in timeArray) {
+                    if (x > recordsAmount-1) break;
+                    declare frame <=> (Page.GetFirstChild("pos_"^x) as CMlFrame);
+                    frame.Show();                    
+                    (frame.Controls[1] as CMlLabel).Value = ""^(cp + 1);
+                    (frame.Controls[3] as CMlLabel).Value = NickNames[login];
+                    (frame.Controls[5] as CMlLabel).Value = TimeToText(time);                   
+                    x += 1;
+                }  
+                
+            }        
+        } // need update
+      } // if
 
-              declare frame <=> (Page.GetFirstChild("pos_"^index) as CMlFrame);
-              frame.Show();
-              (frame.Controls[1] as CMlLabel).Value = ""^Progress[login];
-              (frame.Controls[3] as CMlLabel).Value = Nicknames[Login];
-              (frame.Controls[5] as CMlLabel).Value = TimeToText(time);
-              } else {
-                  declare frame <=> (Page.GetFirstChild("pos_"^x) as CMlFrame);
-                  frame.Hide();
-              }
-              index += 1;
-          }
-      }
-   }
-}
-
-
-
-
+  frames = (1000. / Period);
 ***
-Void Reset() {
-    declare Integer[Text] Times for Page;
-    declare Integer[Text] Progress for Page;
-    declare Text[Text] Nicknames for Page;
-
-    Times.clear();
-    Progress.clear();
-    Nicknames.clear();
-}
 
 Text FormatSec(Real sec) {
     if (sec > 10.) return TextLib::FormatReal(sec,3,False,False);
@@ -111,17 +133,20 @@ Text TimeToText(Integer intime) {
 }
 
 main() {
+  declare Integer LastTick = Now;
+  declare Integer TickCounter = 0;
+  
   wait (InputPlayer != Null);
 
   +++OnInit+++
 
-  while (True) {
-      yield;
+    while (True) {
+        yield;
 
-      if (!PageIsVisible || InputPlayer == Null) {
-  	  		continue;
-      }
+        if (!PageIsVisible || InputPlayer == Null) {
+            continue;
+        }
 
-      +++Loop+++
-  }
+        +++Loop+++
+    }
 }

@@ -1,8 +1,9 @@
 {% extends 'core.views/generics/widget.xml' %}
 
 {% block content %}
+    <label id="fps" text="n/a" pos="0 3" size="40 4" textsize="1" textfont="RajdhaniMono"/>
     {% for time in range(0, records_amount) %}
-      <frame id="pos_{{ loop.index0}}" pos="0 -{{ (loop.index0 * 3.25) }}">
+      <frame id="pos_{{ loop.index0 }}" pos="0 -{{ (loop.index0 * 3.25) }}">
                 <!-- # label cp -->
         <quad pos="0 0" z-index="0" size="4 3" bgcolor="00000070"/>
         <label pos="2 -1.5" z-index="1" size="4 3" textsize="0.3" textfont="RajdhaniMono"
