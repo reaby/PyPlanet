@@ -6,6 +6,7 @@ from pyplanet.views.generics.widget import TimesWidgetView
 class BestCpTimesWidget(TimesWidgetView):
 	widget_x = -124
 	widget_y = 90
+	z_index = 30
 	size_x = 240
 	size_y = 20
 	title = 'Best CPs'
@@ -21,10 +22,7 @@ class BestCpTimesWidget(TimesWidgetView):
 		self.action = self.action_cptimeslist
 
 	async def get_player_data(self):
-		self.logins = []
-		for pcp in self.app.best_cp_times:
-			self.logins.append(pcp.player.login)
-		data = await super().get_all_player_data(self.logins)
+		data = await super().get_player_data()
 		cps = {}
 		for idx, player in enumerate(self.app.instance.player_manager.online):
 			list_cps = []

@@ -3,25 +3,26 @@ import math
 from pyplanet.utils.style import style_strip
 from pyplanet.utils.times import format_time
 from pyplanet.views.generics import ask_confirmation
-from pyplanet.views.generics.tabwidget import TabTimesWidgetView
+from pyplanet.views.generics.widget import TimesWidgetView
 from pyplanet.views.generics.list import ManualListView
 from pyplanet.utils import times
 
 
-class LocalRecordsWidget(TabTimesWidgetView):
+class LocalRecordsWidget(TimesWidgetView):
 	widget_x = 125
 	widget_y = 56.5
 	size_x = 38
 	size_y = 55.5
+	z_index = 30
 	top_entries = 5
 	title = 'Local Records'
 
-	def __init__(self, app, layer="normal"):
+	def __init__(self, app):
 		super().__init__(self)
 		self.app = app
 		self.manager = app.context.ui
-		self.id = 'pyplanet__widgets_localrecords_{}'.format(layer)
-		self.layer = layer
+		self.id = 'pyplanet__widgets_localrecords'
+
 		self.action = self.action_recordlist
 		self.record_amount = 15
 
@@ -53,7 +54,7 @@ class LocalRecordsWidget(TabTimesWidgetView):
 				records_start = (len(current_records) - self.record_amount + self.top_entries)
 				# If start of current slice is in the top entries, add more records below
 				if records_start < self.top_entries:
-					records_start = (self.top_entries)
+					records_start = self.top_entries
 
 				records += list(current_records[records_start:])
 				custom_start_index = (records_start + 1)

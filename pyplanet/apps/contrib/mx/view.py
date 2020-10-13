@@ -3,7 +3,6 @@ MX List Views.
 """
 import asyncio
 import logging
-import re
 
 from pyplanet.views.generics import ManualListView, ask_confirmation
 from pyplanet.apps.contrib.mx.exceptions import MXMapNotFound, MXInvalidResponse
@@ -100,7 +99,7 @@ class MxSearchListView(ManualListView):
 			},
 		]
 
-		if self.app.instance.game.game == "tm":
+		if self.app.instance.game.game in ['tm', 'tmnext']:
 			self.fields.append({
 				'name': 'Length',
 				'index': 'length',
@@ -113,6 +112,9 @@ class MxSearchListView(ManualListView):
 		self.sort_field = None
 		self.child = None
 		self.subscribe("mx_search", self.action_search)
+
+	async def get_title(self):
+		return '🔍 Search {}'.format(self.app.site_name)
 
 	async def get_buttons(self):
 		buttons = [
@@ -272,7 +274,11 @@ class MxSearchListView(ManualListView):
 				await self.app.instance.command_manager.execute(player, '//mx add {}'.format(self.objects[row]['mxid']))
 
 	async def action_install(self, user, values, map, *args, **kwargs):
-		await self.app.instance.command_manager.execute(user, '//mx add', str(map['mxid']))
+		await self.app.instance.command_manager.execute(
+			user,
+			'//{} add'.format(self.app.namespace),
+			str(map['mxid'])
+		)
 
 	async def action_search(self, user, action, values, *args, **kwargs):
 		self.search_map = values['map']
@@ -310,20 +316,20 @@ class MxSearchListView(ManualListView):
 				raise MXMapNotFound("No results for search")
 
 		except MXMapNotFound as e:
-			message = '$f00Error requesting MX-API: Map not found!'
+			message = '$f00Error requesting {}-API: Map not found!'.format(self.app.site_short_name)
 			await self.app.instance.chat(message, self.player)
-			logger.debug('MX-API: Map not found: {}'.format(str(e)))
+			logger.debug('{}-API: Map not found: {}'.format(self.app.site_short_name, str(e)))
 			return None
 		except MXInvalidResponse as e:
-			message = '$f00Error requesting MX-API: Got an invalid response!'
+			message = '$f00Error requesting {}-API: Got an invalid response!'.format(self.app.site_short_name)
 			await self.app.instance.chat(message, self.player)
-			logger.warning('MX-API: Invalid response: {}'.format(str(e)))
+			logger.warning('{}-API: Invalid response: {}'.format(self.app.site_short_name, str(e)))
 			return None
-		if self.app.instance.game.game == "tm":
+		if self.app.instance.game.game in ['tm', 'tmnext']:
 			self.cache = [dict(
 				mxid=_map['TrackID'],
 				name=_map['Name'],
-				gbxname=_map['GbxMapName'],
+				gbxname=_map['GbxMapName'] if _map['GbxMapName'] != '?' else _map['Name'],
 				author=_map['Username'],
 				envir=_map['EnvironmentName'],
 				awards='$fff🏆 {}'.format(_map['AwardCount']) if _map['AwardCount'] > 0 else "",
@@ -337,7 +343,7 @@ class MxSearchListView(ManualListView):
 			self.cache = [dict(
 				mxid=_map['TrackID'],
 				name=_map['Name'],
-				gbxname=_map['GbxMapName'],
+				gbxname=_map['GbxMapName'] if _map['GbxMapName'] != '?' else _map['Name'],
 				author=_map['Username'],
 				envir=_map['EnvironmentName'],
 				awards='$fff🏆 {}'.format(_map['AwardCount']) if _map['AwardCount'] > 0 else "",
@@ -352,8 +358,6 @@ class MxSearchListView(ManualListView):
 
 
 class MxPacksListView(ManualListView):
-	title = '🔍 Search Mania-Exchange'
-
 	def __init__(self, app, player, api):
 		"""
 		:param app: App config instance.
@@ -366,7 +370,7 @@ class MxPacksListView(ManualListView):
 		self.app = app
 		self.api = api
 
-		self.template_name = 'mx/search_pack.xml'
+		self.template_name = 'mx/search.xml'
 		self.response_future = asyncio.Future()
 
 		self.cache = None
@@ -424,6 +428,9 @@ class MxPacksListView(ManualListView):
 		self.child = None
 		self.subscribe("mx_search", self.action_search)
 
+	async def get_title(self):
+		return '🔍 Search {}'.format(self.app.site_name)
+
 	async def get_data(self):
 		if not self.has_data:
 			# First opening, request the data.
@@ -454,7 +461,11 @@ class MxPacksListView(ManualListView):
 		]
 
 	async def action_install(self, user, values, map, *args, **kwargs):
-		await self.app.instance.command_manager.execute(user, '//mxpack add', str(map['mxid']))
+		await self.app.instance.command_manager.execute(
+			user,
+			'//{}pack add'.format(self.app.namespace),
+			str(map['mxid'])
+		)
 
 	async def action_search(self, user, action, values, *args, **kwargs):
 		self.search_map = values['map']
@@ -486,14 +497,14 @@ class MxPacksListView(ManualListView):
 				raise MXMapNotFound("No results for search")
 
 		except MXMapNotFound as e:
-			message = '$f00Error requesting MX-API: Map not found!'
+			message = '$f00Error requesting {}-API: Map not found!'.format(self.app.site_short_name)
 			await self.app.instance.chat(message, self.player)
-			logger.debug('MX-API: Map not found: {}'.format(str(e)))
+			logger.debug('{}-API: Map not found: {}'.format(self.app.site_short_name, str(e)))
 			return None
 		except MXInvalidResponse as e:
-			message = '$f00Error requesting MX-API: Got an invalid response!'
+			message = '$f00Error requesting {}-API: Got an invalid response!'.format(self.app.site_short_name)
 			await self.app.instance.chat(message, self.player)
-			logger.warning('MX-API: Invalid response: {}'.format(str(e)))
+			logger.warning('{}-API: Invalid response: {}'.format(self.app.site_short_name, str(e)))
 			return None
 
 		self.cache = [dict(
@@ -513,7 +524,6 @@ class MxPacksListView(ManualListView):
 
 
 class MxStatusListView(ManualListView):
-	title = 'Server maps status on Mania-Exchange'
 	icon_style = 'Icons128x128_1'
 	icon_substyle = 'Browse'
 
@@ -525,8 +535,12 @@ class MxStatusListView(ManualListView):
 		"""
 		super().__init__()
 		self.manager = app.context.ui
+		self.cache = None
 		self.app = app
 		self.api = api
+
+	async def get_title(self):
+		return 'Server maps status on {}'.format(self.app.site_name)
 
 	async def get_fields(self):
 		fields = [
@@ -555,7 +569,7 @@ class MxStatusListView(ManualListView):
 				'type': 'label'
 			},
 			{
-				'name': 'MX Version',
+				'name': '{} Version'.format(self.app.site_short_name),
 				'index': 'mx_version',
 				'sorting': True,
 				'searching': False,
@@ -590,12 +604,23 @@ class MxStatusListView(ManualListView):
 		# Check if the map could be updated.
 		if instance['action_update'] is True:
 			# Ask for confirmation.
-			cancel = bool(await ask_confirmation(player,
-												 'Are you sure you want to update map \'{}\'$z$s to the version from MX?'.format(
-													 instance['map_name']
-												 ), size='sm'))
+			cancel = bool(
+				await ask_confirmation(player, 'Are you sure you want to update map \'{}\'$z$s to the version from {}?'.format(
+					instance['map_name'],
+					self.app.site_short_name
+				), size='sm')
+			)
 			if cancel is True:
 				return
+
+			folders = None
+			if 'jukebox' in self.app.instance.apps.apps:
+				# Check if the map was part of a map folder.
+				# Remove the current version and add the new version to the folders.
+				folders = await self.app.instance.apps.apps['jukebox'].folder_manager.get_folders_containing_map(instance['map_id'])
+				if folders is not None and len(folders) != 0:
+					for folder in folders:
+						await self.app.instance.apps.apps['jukebox'].folder_manager.remove_map_from_folder(folder.id, instance['map_id'])
 
 			# Remove the current version from the server.
 			mock_remove = namedtuple("data", ["nr"])
@@ -603,15 +628,25 @@ class MxStatusListView(ManualListView):
 
 			# Add the new version from MX.
 			mock_add = namedtuple("data", ["maps"])
-			await self.app.add_mx_map(player, mock_add(maps=[instance['index']]))
+			added_map = await self.app.add_mx_map(player, mock_add(maps=[instance['index']]))
+
+			# If the map could be added and was part of folders, update the folders to contain the new version.
+			if added_map is not None and len(added_map) == 1:
+				if folders is not None and len(folders) != 0:
+					for folder in folders:
+						await self.app.instance.apps.apps['jukebox'].folder_manager.add_map_to_folder(folder.id, added_map[0].id)
 
 			# Update the current view.
 			await self.refresh(player=player)
 
 	async def get_data(self):
+		if self.cache:
+			print('cached')
+			return self.cache
+
 		# Determine which maps on the server could be found on MX (filter those with an ID attached).
 		mx_maps_on_server = [map for map in self.app.instance.map_manager.maps if map.mx_id is not None]
-		mx_maps_info = await self.api.map_info([map.mx_id for map in mx_maps_on_server])
+		mx_maps_info = await self.api.map_info(*[map.mx_id for map in mx_maps_on_server])
 
 		# Loop through the MX-compatible maps on the server.
 		items = []
@@ -626,13 +661,16 @@ class MxStatusListView(ManualListView):
 			mx_map = next((mx_map_info for mx_map_info in mx_maps_info if mx_map_info[0] == item.mx_id), None)
 
 			if mx_map is None:
-				version_match = 'Not on MX'
+				version_match = 'Not on {}'.format(self.app.site_short_name)
 				version_match_order = 1
 			else:
-				mx_version_date = datetime.strptime(mx_map[1]['UpdatedAt'], '%Y-%m-%dT%H:%M:%S.%f').strftime(
-					"%Y-%m-%d %H:%M:%S")
+				date_format = '%Y-%m-%dT%H:%M:%S'
+				if '.' in mx_map[1]['UpdatedAt']:
+					date_format = '%Y-%m-%dT%H:%M:%S.%f'
+				mx_version_date = datetime.strptime(mx_map[1]['UpdatedAt'], date_format).strftime("%Y-%m-%d %H:%M:%S")
+				mx_map_uid = mx_map[1]['TrackUID'] if 'TrackUID' in mx_map[1] else mx_map[1]['MapUID']
 
-				if mx_map[1]['TrackUID'] == item.uid:
+				if mx_map_uid == item.uid:
 					version_match = '$0a0Up-to-date'
 					version_match_order = 2
 				else:
@@ -641,11 +679,18 @@ class MxStatusListView(ManualListView):
 					action_update = True
 
 			action_update_content = '🔁 Update' if action_update else '          -'
-			items.append({'map_id': item.id, 'index': item.mx_id, 'map_name': item.name, 'version_match': version_match,
-						  'version_match_order': version_match_order,
-						  'updated_on_server': item.updated_at, 'mx_version': mx_version_date,
-						  'action_update': action_update, 'action_update_content': action_update_content})
+			items.append({'map_id': item.id, 'index': item.mx_id, 'map_name': item.name, 'version_match': version_match, 'version_match_order': version_match_order,
+				'updated_on_server': item.updated_at, 'mx_version': mx_version_date, 'action_update': action_update, 'action_update_content': action_update_content})
 
 		# Initially sort the maps based on the 'version_match_order': New version -> Not on MX -> Up-to-date.
 		items.sort(key=lambda x: x['version_match_order'])
-		return items
+		self.cache = items
+		return self.cache
+
+	async def destroy(self):
+		self.cache = None
+		return await super().destroy()
+
+	def destroy_sync(self):
+		self.cache = None
+		return super().destroy_sync()

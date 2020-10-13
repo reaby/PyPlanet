@@ -175,7 +175,7 @@ class MapListView(ManualListView):
 			value = row[field['index']]
 			if value is None:
 				return ''
-			if isinstance(value, float) and not math.isnan(value):
+			if isinstance(value, (int, float)) and not math.isnan(value):
 				return times.format_time(int(value))
 			return 'None'
 
@@ -183,7 +183,7 @@ class MapListView(ManualListView):
 			value = row[field['index']]
 			if value is None:
 				return ''
-			if isinstance(value, float) and not math.isnan(value):
+			if isinstance(value, (int, float)) and not math.isnan(value):
 				return int(value)
 			return 'None'
 
@@ -191,13 +191,13 @@ class MapListView(ManualListView):
 			value = row[field['index']]
 			if value is None:
 				return ''
-			prefix = ''
-			if value > 0.0:
-				prefix = '$6C6 '
-			elif value < 0.0:
-				prefix = '$F66 '
-
-			return '{}{}'.format(prefix, value)
+			if isinstance(value, (int, float)) and not math.isnan(value):
+				prefix = ''
+				if value > 0.0:
+					prefix = '$6CF '
+				elif value < 0.0:
+					prefix = '$F66 '
+				return '{}{}'.format(prefix, float(value))
 
 		if self.advanced and not self.app.instance.performance_mode:
 			if 'karma' in self.app.instance.apps.apps:
@@ -418,6 +418,7 @@ class FolderMapListView(MapListView):
 				.where(
 				(MapInFolder.map_id == map_dictionary['id']) & (MapInFolder.folder_id == self.folder_instance.id))
 		)
+		await self.folder_manager.remove_map_from_folder(self.folder_instance.id, map_dictionary['id'])
 
 		# Refresh list.
 		self.cache = list()
@@ -537,7 +538,7 @@ class FolderListView(ManualListView):
 				'searching': False,
 				'width': 30,
 				'renderer': lambda row, field:
-				row[field['index']].capitalize(),
+					row[field['index']].capitalize(),
 				'type': 'label'
 			},
 			{
@@ -602,7 +603,7 @@ class FolderListView(ManualListView):
 		)
 
 		# Refresh list.
-		await self.display(player)
+		await self.refresh(player)
 
 	async def action_show(self, player, values, instance, **kwargs):
 		await self.folder_manager.display_folder(player, instance)
@@ -657,7 +658,7 @@ class CreateFolderView(TemplateView):
 
 	async def get_context_data(self):
 		context = await super().get_context_data()
-		context['is_admin'] = int(not self.player.level >= self.player.LEVEL_ADMIN)
+		context['is_admin'] = self.player.level >= self.player.LEVEL_ADMIN
 		return context
 
 	async def close(self, player, *args, **kwargs):
@@ -706,9 +707,7 @@ class CreateFolderView(TemplateView):
 		if len(folder_name) < 3:
 			self.response_future.set_result(None)
 			self.response_future.done()
-			return await show_alert(player,
-									'The name you gave is not valid. Please provide a name with at least 3 characters.',
-									'sm')
+			return await show_alert(player, 'The name you gave is not valid. Please provide a name with at least 3 characters.', 'sm')
 
 		# Create folder.
 		await self.folder_manager.create_folder(name=folder_name, player=player, public=folder_privacy == 'public')
@@ -789,22 +788,10 @@ class AddToFolderView(TemplateView):
 		if not folder.public and folder.player_id != player.id:
 			return
 
-		# Check for duplicates.
-		existing = await MapInFolder.execute(
-			MapInFolder.select(MapInFolder)
-				.where((MapInFolder.folder == folder) & (MapInFolder.map_id == self.map_id))
-		)
-
-		if len(existing) > 0:
+		# Add map to folder.
+		if not await self.folder_manager.add_map_to_folder(folder.id, self.map_id):
 			await show_alert(player, 'Map already in folder!', 'sm')
 			return
-
-		# Add map to folder.
-		map_in_folder = MapInFolder(
-			map_id=self.map_id,
-			folder=folder
-		)
-		await map_in_folder.save()
 
 		self.response_future.set_result(True)
 		self.response_future.done()

@@ -1,14 +1,160 @@
 Changelog
 =========
 
-0.7.2 (xx January 2020) (UNRELEASED)
-------------------------------------
+0.9.3 (10 September 2020)
+-------------------
+
+Core
+~~~~
+
+* Feature: Add guestlist support. //addguest, //removeguest and adding settings and commands to save it to disk.
+* Improvement: Add mode shortcuts for TM2020, from now you can do //mode ta etc.
+
+Apps
+~~~~
+
+* Feature: Add support for sector times in TM2020.
+* Feature: Add support for live rankings in TM2020.
+* Improvement: Add support for //endround in TM2020.
+* Bugfix: Fixing issue with map info from TMX.
+* Bugfix: Fixing issue with the minimal finishes setting in the karma app.
+* Bugfix: Fixing issue with inserting maps on adding from TMX.
+* Bugfix: Fixing issue with NaN in advanced list.
+
+
+0.9.2 (8 July 2020)
+-------------------
+
+Apps
+~~~~
+
+* Improvement: Add full support for TMX Trackmania Exchange.
+* Bugfix: Fixing issues with the random messages in the ads app.
+
+
+0.9.1 (6 July 2020)
+-------------------
+
+Apps
+~~~~
+
+* Feature: Claim admin rights by /claim [token]. Check the console for the token.
+* Improvement: Adding semi-support for TMX Trackmania Exchange. More support coming later when the API becomes available.
+* Bugfix: Fixing issues with adding maps for the new Trackmania (2020).
+
+
+0.9.0 (1 July 2020)
+-------------------
+
+Core
+~~~~
+
+* Feature: Support for the new Trackmania.
+* Bugfix: Fixing issue with parsing target player in spectator status in the player change callback.
+
+Apps
+~~~~
+
+* Bugfix: CP Difference bugfix for spectating users.
+
+
+0.8.2 (23 May 2020)
+-------------------
+
+Core
+~~~~
+
+* Bugfix: Fixing issue with the non-updating widgets when performance mode is activated for several apps.
+
+0.8.1 (18 May 2020)
+-------------------
+
+
+Apps
+~~~~
+
+* Bugfix: Fixing issue with dedimania and retrying too much (revert new retry mechanism).
+* Bugfix: Temporary fix: Revert the live-rankings as it shows incorrect data during warm-ups.
+* Bugfix: Move the donation widget to the left in Shootmania.
+
+0.8.0 (13 May 2020)
+-------------------
+
+Core
+~~~~
+
+* Feature: Activated Apps lifecycle, enabling and disabling apps on the fly depending on it's requirements.
+* Feature: Add player toolbox/toolbar. You can disable this with a setting in //settings in-game.
+* Feature: Add CP Comparison to find the best checkpoints by using the best checkpoint times of all local records (/cpcomparison).
+
+* Improvement: Dropping Python 3.5 support!
+* Improvement: Add //helpall and /helpall for a detailed list of commands!
+* Improvement: Only commands that you have permission for will be listed in //help
+* Improvement: Remove the deprecated ``instance.signal_manager``.
+* Improvement: Add deprecated warning for ``get_player_data`` method.
+* Improvement: Improve error reporting when an app failed loading.
+* Improvement: Check for platform versions, check if Python is compatible with the PyPlanet installation.
+* Improvement: Add support for list/set typed settings.
+* Improvement: Add a z-index to different widgets so it will be correctly visible on the podium stage.
+* Improvement: Improve list visibility on Shootmania based games.
+* Improvement: Add new version of //call with Graphical Interfaces.
+
+* Bugfix: Fixing issue with an empty command input (/ without any text) resulting in executing the last registered command.
+* Bugfix: Fixing issue with converting from UAseco when the filename is empty (from a previous XAseco installation).
+* Bugfix: Crash with very long map names. Now truncating map names to the maximum allowed length in the database.
+
+
+Apps
+~~~~
+
+* New App: Added Fun Commands app with /gg, /nt, /n1, /ragequit, etc. Add ``pyplanet.apps.contrib.funcmd`` to your apps config.
+
+* Feature: Implemented Emoji Chat toolbar into the fun commands app. Disable with //settings.
+* Feature: Add donation widget to the transactions app. On by default, only showing at podium. Change to always with //settings.
+* Feature: Add random messages to the Ads app. Add messages and change the interval with //settings.
+* Feature: Add gear indicator to the sector_times app, only works in Stadium based games. Enabled by default, disable with //settings.
+* Feature: Add points retrieved to the live rankings widget, replacing the build-in finish widget, only works in rounds-based modes.
+
+* Improvement: Make sure all contrib apps don't use ``get_player_data`` anymore.
+* Improvement: Decrease size of the AD buttons (Discord and PayPal buttons).
+* Improvement: Move the checkpoint difference widgets a bit higher so it doesn't block the view so much (sector_times app).
+* Improvement: Improve the retry mechanism of Dedimania during connection issues.
+* Improvement: Make sure that updated maps with MX will reappear in the map folders.
+* Improvement: Switch the dedimania widget with liveranking and currentcps widgets if dedimania widget is not visible.
+
+* Bugfix: Using the map name from MX if the Gbx map name is not provided by MX.
+* Bugfix: Fixing issue with MX update check on Shootmania.
+* Bugfix: Show a warning when a map might fail with dedimania due to the size of the embedded blocks.
+* Bugfix: Ignore invalid checkpoint times in the best cps widget.
+
+
+0.7.4 (04 March 2020)
+---------------------
+
+Apps
+~~~~
+
+* Bugfix: Fixing issue with the MX update dialog and it's internal logic.
+
+
+0.7.3 (02 March 2020)
+---------------------
+
+Core
+~~~~
+
+* Bugfix: Make sure the libraries also work for older Python versions (3.5.x).
+
+
+0.7.2 (02 March 2020)
+---------------------
 
 Core
 ~~~~
 
 * Improvement: Python 3.8.x support!
 * Improvement: Update libraries used.
+* Improvement: Better error handling for loading configuration/settings files.
 * Bugfix: Make sure the MX-id is properly extracted and inserted into the database.
 
 Apps

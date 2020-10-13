@@ -8,6 +8,7 @@ import logging
 class CPWidgetView(TimesWidgetView):
 	widget_x = -160
 	widget_y = 70.5
+	z_index = 30
 	size_x = 38
 	size_y = 55.5
 	title = 'Current CPs'
@@ -68,6 +69,10 @@ class CPWidgetView(TimesWidgetView):
 		data.update(cps)
 
 		return data
+
+	async def get_context_data(self):
+		self.widget_y = 12.5 if self.app.dedimania_enabled else 70.5
+		return await super().get_context_data()
 
 	async def handle_catch_all(self, player, action, values, **kwargs):
 		logging.debug("CatchAll: " + player.login + ": " + action)
