@@ -4,18 +4,18 @@
 
 main() {
   declare oldGear = 1;
-  declare oldState = CTmMlPlayer::ERaceState::Eliminated;
+  declare CSmPlayer::ESpawnStatus oldState = CSmPlayer::ESpawnStatus::NotSpawned;
 
   declare label_indicator <=> (Page.GetFirstChild("indicator") as CMlLabel);
   declare label_gear <=> (Page.GetFirstChild("gear") as CMlLabel);
 
   while(True) {
     yield;
-    if (GUIPlayer == Null || GUIPlayer.RaceState == CTmMlPlayer::ERaceState::Finished) continue;
+    if (GUIPlayer == Null) continue;
 
-    if (GUIPlayer.RaceState != oldState) {
-      oldState = GUIPlayer.RaceState;
-      if (GUIPlayer.RaceState == CTmMlPlayer::ERaceState::BeforeStart) {
+    if (GUIPlayer.SpawnStatus != oldState) {
+      oldState = GUIPlayer.SpawnStatus;
+      if (GUIPlayer.SpawnStatus == CSmPlayer::ESpawnStatus::Spawning) {
         oldGear = 1;
       }
     }
@@ -42,7 +42,7 @@ main() {
         label_gear.Value = "" ^ GUIPlayer.EngineCurGear;
       }
 
-      AnimMgr.Add(label_gear, """<label opacity="0"/>""", 500, CAnimManager::EAnimManagerEasing::SineInOut);
+    //  AnimMgr.Add(label_gear, """<label opacity="0"/>""", 500, CAnimManager::EAnimManagerEasing::SineInOut);
       oldGear = GUIPlayer.EngineCurGear;
     }
 

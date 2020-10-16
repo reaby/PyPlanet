@@ -143,7 +143,7 @@ class MapListView(ManualListView):
 				'sorting': True,
 				'searching': True,
 				'search_strip_styles': True,
-				'width': 90,
+				'width': 80,
 				'type': 'label',
 				'action': self.action_jukebox
 			},

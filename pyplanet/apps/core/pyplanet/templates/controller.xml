@@ -1,14 +1,6 @@
-<quad pos="150 -50" z-index="100" size="15 15" image="http://maniacdn.net//toffe/pyplanet/assets/logo/pyplanet-xs.png"
+<!-- <quad pos="150 -50" z-index="100" size="15 15" image="http://maniacdn.net//toffe/pyplanet/assets/logo/pyplanet-xs.png"
       autoscale="0" keepratio="Clip" halign="center" valign="center" opacity="0.4" url="http://pypla.net/" />
-
-{% if game == 'tm' %}
-  <label pos="0 -86.5" z-index="100" size="52 5" text="Report issue / suggestion" style="TextButtonNav" scale="0.6"
-         url="https://github.com/PyPlanet/PyPlanet/issues/new" halign="center" />
-{% else %}
-  <label pos="140 -86.5" z-index="100" size="52 5" text="Report issue / suggestion" style="TextButtonNav" scale="0.6"
-         url="https://github.com/PyPlanet/PyPlanet/issues/new" halign="center" />
-{% endif %}
-
+ -->
 
 <!-- Disable chat -->
 <frame pos="{{ chat_pos }}" z-index="60" id="player_hide_chat_frame">
@@ -19,8 +11,8 @@
 
 <!-- Hidden F8 and F9 -->
 <label pos="0 0" z-index="0" size="0 0" textsize="0.0" hide="1" text="" action="{{ id }}__f8"
-       actionkey="4" scriptevents="4" halign="center" valign="center2" />
+       actionkey="4" scriptevents="1" halign="center" valign="center2" />
 <label pos="0 0" z-index="0" size="0 0" textsize="0.0" hide="1" text="" action="{{ id }}__f9"
-       actionkey="5" scriptevents="4" halign="center" valign="center2" />
+       actionkey="5" scriptevents="1" halign="center" valign="center2" />
 
 <script><!-- {% include 'core.pyplanet/controller.Script.Txt' %} --></script>

@@ -2,8 +2,6 @@
 // == CP DIFF ==
 // =============
 
-#Include "TextLib" as TL
-
 // Includes
 {% include 'core.views/libs/TimeUtils.Script.Txt' %}
 
@@ -28,7 +26,6 @@ declare Integer[] BestCheckpoints;
 declare Text BestSource;
 
 declare Integer HideFrameAt;
-
 
 Void UpdateInterface() {
   // Current lap sector time.
@@ -66,17 +63,17 @@ Void UpdateInterface() {
     if (Difference > 0) {
       DifferencePrefix = "$C30";
       DifferenceIcon = ""; // Down. &#xf107;
-      DifferenceBackgroundColor = TL::ToColor("C30"); // Red
+      DifferenceBackgroundColor = TextLib::ToColor("C30"); // Red
     } else if (Difference < 0) {
       DifferencePrefix = "$02F";
       DifferenceIcon = ""; // Up. &#xf105;
-      DifferenceBackgroundColor = TL::ToColor("02F"); // Blue
+      DifferenceBackgroundColor = TextLib::ToColor("02F"); // Blue
     }
   }
 
   // Fill the time difference labels and backgrounds.
   Sector_CPTime_TimeBg.BgColor = DifferenceBackgroundColor;
-  Sector_CPTime_TimeBg.Opacity = 0.5;
+  Sector_CPTime_TimeBg.Opacity = 0.6;
   Sector_CPTime_TimeIcon.SetText(DifferenceIcon);
   Sector_CPTime_TimeLabel.SetText(TimeToText(Difference));
 
@@ -91,13 +88,13 @@ Void UpdateInterface() {
 }
 
 Integer[] ParseCheckpoints(Text RawInput) {
-  if (TL::Length(RawInput) == 0) {
+  if (TextLib::Length(RawInput) == 0) {
     return Integer[];
   }
   declare Integer[] Output;
-  declare Text[] Checkpoints = TL::Split(",", RawInput);
+  declare Text[] Checkpoints = TextLib::Split(",", RawInput);
   foreach (Check in Checkpoints) {
-    Output.add(TL::ToInteger(Check));
+    Output.add(TextLib::ToInteger(Check));
   }
   return Output;
 }
@@ -114,7 +111,7 @@ Void ShowDiff() {
 Integer GetCPCount() {
 	declare Integer count;
 	declare Ident[][Integer] orders;
-	
+
 	foreach(Landmark in MapLandmarks) {
 		if ( (Landmark.Waypoint != Null && (Landmark.Waypoint.IsFinish || Landmark.Waypoint.IsMultiLap)) || Landmark.Tag == "Spawn") {
 			continue;
@@ -134,10 +131,11 @@ Integer GetCPCount() {
 	}
 	return count + 1; // +1 for ending
 }
-main() {
-	
+
+*** OnInit ***
+***
   declare LastCpCount = -1;
-	
+
   // Set variables
   Sector_CPTime_Frame = (Page.GetFirstChild("cp_time_frame") as CMlFrame);
   Sector_CPTime_Data = (Page.GetFirstChild("cp_time_data") as CMlLabel);
@@ -147,7 +145,7 @@ main() {
   Sector_CPTime_RecordLabel = (Page.GetFirstChild("cp_time_compare_record") as CMlLabel);
 
   // Score + cps from the records.
-  BestScore = TL::ToInteger(Sector_CPTime_Data.DataAttributeGet("record"));
+  BestScore = TextLib::ToInteger(Sector_CPTime_Data.DataAttributeGet("record"));
   BestCheckpoints = ParseCheckpoints(Sector_CPTime_Data.DataAttributeGet("record-sectors"));
   BestSource = Sector_CPTime_Data.DataAttributeGet("record-source");
 
@@ -159,14 +157,15 @@ main() {
   // Initial update to clear the UI.
   UpdateInterface();
   HideDiff();
+***
 
-  // Main Loop.
-  while(True) {
+***Loop***
+***
     // Check if the CP Diff should be hidden.
     if (HideFrameAt != 0 && HideFrameAt <= Now) {
       HideDiff();
     }
-    if (GUIPlayer != Null){
+    if (GUIPlayer != Null) {
       declare wayPointTimesCount = GUIPlayer.RaceWaypointTimes.count;
       declare Boolean IsSpectating = GUIPlayer != InputPlayer;
 	  //New cp or reset
@@ -181,11 +180,11 @@ main() {
           if (GUIPlayer.StartTime >= 0) {
             CurrentCheckpoint = wayPointTimesCount;
             CurrentCheckpointScores.add(GUIPlayer.RaceWaypointTimes[wayPointTimesCount - 1]);
-			ShowDiff();
+			      ShowDiff();
             UpdateInterface();
-			
-			
-			
+
+
+
             if (CurrentCheckpoint >= TotalCheckpoints) { // end of lap (TODO handle multilap)
               CurrentCheckpoint = 0;
               if (! IsSpectating && (BestScore <= 0 || GUIPlayer.RaceWaypointTimes[wayPointTimesCount - 1] < BestScore) && CurrentCheckpointScores.count == TotalCheckpoints) {
@@ -200,6 +199,4 @@ main() {
         LastCpCount = wayPointTimesCount;
       }
     }
-    yield;
-  }
-}
+***

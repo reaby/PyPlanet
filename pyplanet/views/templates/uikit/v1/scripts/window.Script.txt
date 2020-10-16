@@ -1,5 +1,4 @@
 ***OnInit***
 ***
-  AnimMgr.Add((Page.GetFirstChild("WindowFrame") as CMlFrame), "<frame scale=\"1.0\"/>", 150, CAnimManager::EAnimManagerEasing::BackOut);
-
+  AnimMgr.Add((Page.GetFirstChild("WindowFrame") as CMlFrame), "<frame scale=\"1.0\"/>", 250, CAnimManager::EAnimManagerEasing::BackOut);
 ***

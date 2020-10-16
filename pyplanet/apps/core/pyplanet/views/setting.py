@@ -50,6 +50,7 @@ class SettingMenuView(ManualListView):
 
 		# Show edit view.
 		self.child = SettingEditView(self, self.player, setting)
+		await self.hide()
 		await self.child.display()
 		await self.child.wait_for_response()
 		await self.child.destroy()
@@ -110,7 +111,7 @@ class SettingMenuView(ManualListView):
 				'index': 'value',
 				'sorting': False,
 				'searching': False,
-				'width': 100,
+				'width': 80,
 				'type': 'label',
 				'renderer': self.value_renderer,
 				'action': self.open_edit_setting

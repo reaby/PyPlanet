@@ -16,9 +16,6 @@
 declare Text activeMenu;
 
 Void showMenu(CMlFrame menuFrame, Boolean needWait) {
-  UI.OverlayHideChrono = True;
-  ClientUI.OverlayHideChrono = True;
-  Playground.UI.OverlayHideChrono = True;
 	declare id = TextLib::ToInteger(menuFrame.DataAttributeGet("menuId"));
 	declare CMlLabel label;
 	declare CMlFrame mainFrame <=> (Page.GetFirstChild("mainMenu") as CMlFrame);
@@ -41,7 +38,6 @@ Void showMenu(CMlFrame menuFrame, Boolean needWait) {
 }
 
 Void hideMenu(CMlFrame menuFrame) {
-  Playground.UI.OverlayHideChrono = False;
 	activeMenu = "";
 	declare id = TextLib::ToInteger(menuFrame.DataAttributeGet("menuId"));
 	declare CMlFrame mainFrame <=> (Page.GetFirstChild("mainMenu") as CMlFrame);
@@ -68,7 +64,7 @@ main() {
 
 	// initial hide
 	for (x, 0, C_submenuCount-1) {
-	    declare CMlFrame menuFrame <=> (Page.GetFirstChild("submenu_"^x) as CMlFrame);
+	  declare CMlFrame menuFrame <=> (Page.GetFirstChild("submenu_"^x) as CMlFrame);
 		declare CMlFrame mainFrame <=> (Page.GetFirstChild("mainMenu") as CMlFrame);
 		declare label <=> (mainFrame.Controls[x] as CMlLabel);
 		if (label != Null) {

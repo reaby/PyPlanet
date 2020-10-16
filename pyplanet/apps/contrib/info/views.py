@@ -1,11 +1,8 @@
-
 from pyplanet import __version__ as version
 from pyplanet.apps.core.maniaplanet.models import Player
 from pyplanet.views.generics.widget import WidgetView
 from pyplanet.utils import times
 from pyplanet.contrib.player.exceptions import PlayerNotFound
-
-logger = logging.getLogger(__name__)
 
 
 class MapInfoWidget(WidgetView):

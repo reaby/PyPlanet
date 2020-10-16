@@ -1,6 +1,6 @@
 {% macro button(text='Default', action='', pos_x=0, pos_y=0, width=18, height=5, class='', id='', halign="center") %}
   {% if halign == "center" %}
-<frame pos="{{pos_x + (width/2)}}  {{pos_y - (height/2)}}" class="uiContainer uiButton" data-action="{{action}}" id="{{id}}">
+<frame pos="{{pos_x + (width/2)}} {{pos_y - (height/2)}}" class="uiContainer uiButton" data-action="{{action}}" id="{{id}}">
 {% else %}
 <frame pos="{{pos_x}} {{pos_y - (height/2)}}" class="uiContainer uiButton" data-action="{{action}}" id="{{id}}">
   {% endif %}
@@ -10,21 +10,21 @@
 
 {% macro button_basic(text='Default', action='', pos_x=0, pos_y=0, width=18, height=5, class='', id='', halign='center') %}
   {% if halign == "center" %}
-<frame pos="{{pos_x + (width/2)}}  {{pos_y - (height/2)}}" class="uiContainer uiButton" data-action="{{action}}" id="{{id}}">
+  <frame pos="{{pos_x + (width/2)}} {{pos_y - (height/2)}}" class="uiContainer uiButton" id="{{id}}">
 {% else %}
-<frame pos="{{pos_x}} {{pos_y - (height/2)}}" class="uiContainer uiButton" data-action="{{action}}">
+<frame pos="{{pos_x}} {{pos_y - (height/2)}}" class="uiContainer uiButton">
   {% endif %}
-  <label size="{{width}} {{height}}" text="{{text}}" class="{{class}} uiButtonElement" halign="{{halign}}" valign="center"
+  <label z-index="2" size="{{width}} {{height}}" text="{{text}}" class="{{class}} uiButtonElement" halign="{{halign}}" valign="center2"
          action="{{action}}" scriptevents="1" translate="0" />
 </frame>
 {% endmacro %}
 
 {% macro button_outline(text='Default', action='', pos_x=0, pos_y=0, width=18, height=5, class='', id='') %}
-<frame pos="{{pos_x + (width/2)}}  {{pos_y - (height/2)}}" class="uiContainer uiButton" data-action="{{action}}">
+<frame pos="{{pos_x + (width/2)}} {{pos_y - (height/2)}}" class="uiContainer uiButton" data-action="{{action}}">
   <quad size="{{width*2}} {{height*2}}" style="Bgs1InRace" substyle="BgColorContour" halign="center"
         valign="center2" scale="0.5" class="{{class}}"/>
   <label size="{{width-0.5}} {{height-0.5}}" text="{{text}}" focusareacolor1="0000" class="{{class}} uiButtonElement" halign="center" valign="center2"
-           scriptevents="1" translate="0" />
+           scriptevents="1" />
 </frame>
 {% endmacro %}
 
@@ -88,8 +88,8 @@
   <entry pos="0 0" size="{{ (width - 5) }} 5" valign="center" class="{{class}} uiEntry"
          selecttext="1" default="{{ text|default('', True) }}" textformat="Password" name="{{ name }}"/>
   <frame pos="{{ (width - 2.5) }} 0">
-    <quad size="10 10" scale="0.5" style="Bgs1InRace" colorize="ddd" substyle="BgColorContour" halign="center" valign="center2"/>
-    <label size="4 4" text="" class="{{class}} uiMaskedToggle" halign="center" valign="center2" scriptevents="1" translate="0" />
+    <quad size="10 10" scale="0.5" style="Bgs1InRace" colorize="ddd" substyle="BgColorContour" halign="center" valign="center2" class="uiMaskedToggle" scriptevents="1"/>
+    <label z-index="1" size="4 4" text="" class="{{class}} uiMaskedToggle" halign="center" valign="center2" scriptevents="1" translate="0" />
   </frame>
 </frame>
 {% endmacro %}
@@ -113,6 +113,7 @@
          scrollmax="{{scrollWidth}} {{scrollHeight}}">
     <frame>
       {{ caller() }}
+      <quad size="{{width - 5}} {{scrollHeight + height}}" bgcolor="0000" scriptevents="1" />
     </frame>
   </frame>
   <frame pos="{{width}} 0" class="uiScrollbarControl">

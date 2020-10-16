@@ -5,17 +5,17 @@
   {% block title %}
       {% if title %}
           {% if open_action %}
-          <label pos="17.5 -6" z-index="1" size="35 5" text="{{ title }}" textfont="RajdhaniMono" textsize="1.5"
-                 textemboss="1" halign="center" valign="bottom"
-                 action="{{ id }}__open_widget" scriptevents="1" focusareacolor1="0000" focusareacolor2="0006" />
-          <label pos="33 -3.5" z-index="2" size="4 5" text="&#xf08e;" textsize="1.0" halign="center" valign="center2"
-                 action="{{ id }}__open_widget" scriptevents="1" focusareacolor1="0000"/>
+          <label pos="17.5 -6" z-index="1" size="35 3" text="$i{{ title }}" textsize="1.0"
+                 textemboss="0" halign="center" valign="bottom"
+                 action="{{ id }}__open_widget" scriptevents="1" focusareacolor1="050b" focusareacolor2="090a" />
+          <!-- <label pos="33 -3.5" z-index="2" size="4 3" text="&#xf08e;" textsize="0.6" halign="center" valign="center2"
+                 action="{{ id }}__open_widget" scriptevents="1" focusareacolor1="0000"/> -->
           {% else %}
-          <label pos="17.5 -6" z-index="1" size="35 5" text="{{ title }}" textfont="RajdhaniMono" textsize="1.5"
-                 textemboss="1" halign="center" valign="bottom" focusareacolor1="0000" focusareacolor2="0000"/>
+          <label pos="17.5 -6" z-index="1" size="35 3" text="$i{{ title }}" textfont="" textsize="1.0"
+                 textemboss="0" scriptevents="1" halign="center" valign="bottom" focusareacolor1="050a" focusareacolor2="050a"/>
           {% endif %}
           <quad pos="0 -6" size="35 0.30" bgcolor="FFFa" />
-          <quad pos="0 -5.5" size="15 0.5" bgcolor="FFFa" />
+
       {% endif %}
   {% endblock %}
 

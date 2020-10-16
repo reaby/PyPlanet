@@ -86,11 +86,11 @@ class LocalRecordsWidget(TimesWidgetView):
 				record_player = await record.get_related('player')
 				list_record = dict()
 				list_record['index'] = index
-				list_record['color'] = '$fff'
+				list_record['color'] = 'fff'
 				if index <= self.top_entries:
-					list_record['color'] = '$ff0'
+					list_record['color'] = 'ff0'
 				if index == player_index:
-					list_record['color'] = '$0f3'
+					list_record['color'] = '0f3'
 				list_record['nickname'] = record_player.nickname
 				list_record['score'] = times.format_time(int(record.score))
 				if index == self.top_entries:
@@ -128,9 +128,9 @@ class LocalRecordsWidget(TimesWidgetView):
 				record_player = await record.get_related('player')
 				list_record = dict()
 				list_record['index'] = index
-				list_record['color'] = '$fff'
+				list_record['color'] = 'fff'
 				if index <= self.top_entries:
-					list_record['color'] = '$ff0'
+					list_record['color'] = 'ff0'
 				list_record['nickname'] = record_player.nickname
 				list_record['score'] = times.format_time(int(record.score))
 				index += 1

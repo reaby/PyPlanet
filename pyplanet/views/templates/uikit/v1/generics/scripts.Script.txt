@@ -111,7 +111,7 @@ Void uiRenderCheckbox(CMlFrame frame) {
     declare uiControl = frame.Controls[2];
     declare CMlLabel boxFrame = (frame.Controls[3] as CMlLabel);
     if (frame.DataAttributeGet("disabled") == "1") {
-        boxFrame.TextColor = <0.4,0.4,0.4>;     
+        boxFrame.TextColor = <0.4,0.4,0.4>;
     } else {
         boxFrame.TextColor = <1.,1.,1.>;
     }
@@ -244,7 +244,6 @@ if (Event.Control.HasClass("uiSelectElement")) {
 }
 ***
 
-
 /*  ------------------- end Dropdown ------------------------- */
 
 /* -------------------- masked input --------------------------------- */
@@ -253,14 +252,15 @@ if (Event.Control.HasClass("uiSelectElement")) {
     if (Event.Control.HasClass("uiMaskedToggle") ) {
          declare CMlFrame frame <=> Event.Control.Parent.Parent;
          declare CMlEntry input <=> (frame.Controls[0] as CMlEntry);
+         declare CMlLabel label_ <=> ((Event.Control.Parent as CMlFrame).Controls[1] as CMlLabel);
          if (input.DataAttributeGet("type") == "Basic") {
            input.DataAttributeSet("type", "Password");
            input.TextFormat = CMlEntry::ETextFormat::Password;
-           (Event.Control as CMlLabel).Value = "";
+           label_.Value = "";
          } else {
            input.DataAttributeSet("type", "Basic");
            input.TextFormat = CMlEntry::ETextFormat::Basic;
-           (Event.Control as CMlLabel).Value = "";
+           label_.Value = "";
          }
     }
 ***

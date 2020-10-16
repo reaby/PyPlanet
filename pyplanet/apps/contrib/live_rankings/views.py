@@ -85,11 +85,11 @@ class LiveRankingsWidget(TimesWidgetView):
 			list_record = dict()
 			list_record['index'] = index
 
-			list_record['color'] = '$fff'
+			list_record['color'] = 'fff'
 			if index <= self.top_entries:
-				list_record['color'] = '$ff0'
+				list_record['color'] = 'ff0'
 			if index == player_index:
-				list_record['color'] = '$0f3'
+				list_record['color'] = '0f3'
 
 			list_record['login'] = record['login']
 			list_record['nickname'] = record['nickname']

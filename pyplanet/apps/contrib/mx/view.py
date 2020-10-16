@@ -90,8 +90,8 @@ class MxSearchListView(ManualListView):
 				'type': 'label'
 			},
 			{
-				'name': 'Difficulty',
-				'index': 'difficulty',
+				'name': 'Style',
+				'index': 'style',
 				'sorting': True,
 				'searching': False,
 				'width': 25,
@@ -161,7 +161,7 @@ class MxSearchListView(ManualListView):
 				"value": "22"
 			}
 		]
-		if self.app.instance.game.game == "tm":
+		if self.app.instance.game.game == "tm" or self.app.instance.game.game == "tmnext":
 			data['styles'] = [
 				{
 					"text": "Select...",

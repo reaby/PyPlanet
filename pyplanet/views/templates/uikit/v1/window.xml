@@ -1,33 +1,37 @@
 {% extends 'core.views/uikit/v1/generics/bootstrap.xml' %}
 
-{% block main %}
-<frame pos="-160 90" z-index="150" id="Window"> <!-- set z-index high enough -->
-	<frame pos="160 -90"> <!-- reset to 0,0 -->
+  {% block main %}
+<frame pos="-160 90" id="Window"> <!-- set z-index high enough -->
+  <frame pos="160 -90"> <!-- reset to 0,0 -->
+    <frame pos="-120 70" scale="1.02" id="WindowFrame" halign="center" valign="center"> <!-- window position -->
+      <frame pos="0 0">
+        {% block header %}
+        <label id="Title" pos="2 -2" textsize="2.5" text="$i$t{{title}}" halign="left" valign="top"
+               textprefix="{{icon}}  " textfont="RajdhaniMono"/>
+        {% if fields %}
+        {{ ui.button_outline("", id+"__button_refresh", 225.5, -1, 6, 6, "transparent") }}
+        {{ ui.button_outline("✖", id+"__button_close", 232, -1, 6, 6, "closeButton") }}
+        {% else %}
+        {{ ui.button("✖", id+"__button_close", 232, -1, 6, 6, "closeButton" ) }}
+        {% endif %}
+        <quad pos="0 0" size="240 8" bgcolor="000a"/>
+        {% endblock %}
 
-  <frame pos="-120 70" id="WindowFrame" scale="1"  halign="center" valign="center"> <!-- window position -->
-      {% block header %}
-          <quad pos="0 -6.5" size="240 0.35" bgcolor="FFFa" />
-          <quad pos="0 -6" size="59 0.55" bgcolor="FFFa" />
-          <label pos="2 -2" textsize="2.5" size="220 7" text="{{title}}" halign="left" valign="top" textprefix="{{icon}}  " textfont="RajdhaniMono"/>
-            {% if fields %}
-                {{ ui.button_basic("", id+"__button_refresh", 226, 0, 6, 6, "transparent") }}
-                {{ ui.button_basic("✖", id+"__button_close", 232, 0, 6,6, "closeButton" ) }}
-            {% else %}
-               {{ ui.button_basic("✖", id+"__button_close", 232, 0, 7, 7, "closeButton" ) }}
-            {% endif %}
-     {% endblock %}
 
-      <frame pos="0 -18">
-        {% block contents %} {% endblock %}
+        <frame pos="0 -18">
+          {% block contents %} {% endblock %}
+        </frame>
+
+        <quad pos="120 0" size="240 140" halign="center" bgcolor="008040f0"/>
       </frame>
-
-    <quad pos="120 0" size="240 140" halign="center" style="Bgs1" substyle="BgDialogBlur" />
+    </frame>
 
   </frame>
 
-	</frame>
-   <!-- disables clicking other elements when window is open -->
-  <quad size="320 180" bgcolor="0000" scriptevents="1" />
+  <!--  <quad size="320 180" bgcolor="0000" scriptevents="1" z-index="-1"/> <!-- disables clicking other elements when window is open -->
 </frame>
-{% endblock %}
+  {% endblock %}
 
+  {% block maniascript %}
+<script><!-- {% include 'core.views/uikit/v1/scripts/window.Script.txt' %} --></script>
+  {% endblock %}

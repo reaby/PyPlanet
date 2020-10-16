@@ -29,7 +29,7 @@ class BestCpTimesWidget(TimesWidgetView):
 			for pcp in self.app.best_cp_times:
 				list_time = {
 					'index': pcp.cp,
-					'color': "$0f3" if player.login == pcp.player.login else "$ff0",
+					'color': "0f3" if player.login == pcp.player.login else "ff0",
 					'cptime': times.format_time(pcp.time),
 					'nickname': pcp.player.nickname,
 					'login': pcp.player.login

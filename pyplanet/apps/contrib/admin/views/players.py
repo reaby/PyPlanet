@@ -36,7 +36,7 @@ class PlayerListView(ManualListView):
 				'sorting': False,
 				'searching': True,
 				'width': 40,
-				'type': 'label',
+				'type': 'entry',
 			},
 			{
 				'name': 'Spec',

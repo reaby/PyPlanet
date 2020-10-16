@@ -10,6 +10,6 @@
 ***
 if (PrevTime != CurrentLocalDateText) {
   PrevTime = CurrentLocalDateText;
-  LabelLocalTime.Value = TextLib::SubString(CurrentLocalDateText, 11, 20);
+  LabelLocalTime.Value = TextLib::SubString(CurrentLocalDateText, 11, 5);
 }
 ***

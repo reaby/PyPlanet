@@ -5,7 +5,6 @@ from pyplanet.views.generics.widget import WidgetView
 class SectorTimesWidget(WidgetView):
 	widget_x = 20
 	widget_y = -70
-
 	template_name = 'sector_times/sector_times.xml'
 
 	def __init__(self, app):
@@ -68,9 +67,8 @@ class SectorTimesWidget(WidgetView):
 
 
 class CheckpointDiffWidget(WidgetView):
-	widget_x = 0
-	widget_y = 0
-
+	widget_x = -10
+	widget_y = 27
 	template_name = 'sector_times/cp_diff.xml'
 
 	def __init__(self, app):
@@ -132,7 +130,7 @@ class CheckpointDiffWidget(WidgetView):
 
 class GearIndicatorView(TemplateView):
 	template_name = 'sector_times/gear_indicator.xml'
-
+	title = 'Gear indicator'
 	def __init__(self, app, *args, **kwargs):
 		super().__init__(app.context.ui, *args, **kwargs)
 		self.app = app

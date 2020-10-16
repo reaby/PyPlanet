@@ -17,7 +17,6 @@ class Menu(AppConfig):
 		await self.instance.command_manager.register(
 			Command(command='menu', target=self.on_connect, admin=False))
 		await self.menu.display()
-		self.instance.ui_manager.properties.set_visibility('checkpoint_list', False)
 
 	async def on_connect(self, player, *args, **kwargs):
 		await self.menu.display(logins=[player.login])

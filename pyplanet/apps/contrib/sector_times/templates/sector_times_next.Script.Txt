@@ -2,8 +2,6 @@
 // == SECTOR TIMES ==
 // ==================
 
-#Include "TextLib" as TL
-
 // Includes
 {% include 'core.views/libs/TimeUtils.Script.Txt' %}
 
@@ -65,11 +63,11 @@ Void UpdateInterface() {
     if (Difference > 0) {
       DifferencePrefix = "$C30";
       DifferenceIcon = ""; // Down. &#xf107;
-      DifferenceBackgroundColor = TL::ToColor("C30"); // Red
+      DifferenceBackgroundColor = TextLib::ToColor("C30"); // Red
     } else if (Difference < 0) {
       DifferencePrefix = "$02F";
       DifferenceIcon = ""; // Up. &#xf105;
-      DifferenceBackgroundColor = TL::ToColor("02F"); // Blue
+      DifferenceBackgroundColor = TextLib::ToColor("02F"); // Blue
     }
   }
 
@@ -99,13 +97,13 @@ Void UpdateInterface() {
 }
 
 Integer[] ParseCheckpoints(Text RawInput) {
-  if (TL::Length(RawInput) == 0) {
+  if (TextLib::Length(RawInput) == 0) {
     return Integer[];
   }
   declare Integer[] Output;
-  declare Text[] Checkpoints = TL::Split(",", RawInput);
+  declare Text[] Checkpoints = TextLib::Split(",", RawInput);
   foreach (Check in Checkpoints) {
-    Output.add(TL::ToInteger(Check));
+    Output.add(TextLib::ToInteger(Check));
   }
   return Output;
 }
@@ -113,7 +111,7 @@ Integer[] ParseCheckpoints(Text RawInput) {
 Integer GetCPCount() {
 	declare Integer count;
 	declare Ident[][Integer] orders;
-	
+
 	foreach(Landmark in MapLandmarks) {
 		if ( (Landmark.Waypoint != Null && (Landmark.Waypoint.IsFinish || Landmark.Waypoint.IsMultiLap)) || Landmark.Tag == "Spawn") {
 			continue;
@@ -133,7 +131,10 @@ Integer GetCPCount() {
 	}
 	return count + 1; // +1 for ending
 }
-main() {
+
+***OnInit***
+***
+
   // Access the local + dedimania variables. TODO: Implement this in the local + dedi widgets.
   declare Integer PyApp_local_records__player_score for LocalUser;
   declare Integer PyApp_dedimania__player_score for LocalUser;
@@ -141,7 +142,7 @@ main() {
 
   declare Boolean Prev_DistractionFreeMode = False;
   declare netwrite Boolean Net_DistractionFreeMode for UI;
-  
+
   declare LastCpCount = -1;
 
   // Set variables
@@ -155,7 +156,7 @@ main() {
   Sector_SectorDiff_IconBg = (Page.GetFirstChild("sector_time_diff_iconbg") as CMlQuad);
 
   // Score + cps from the records.
-  BestScore = TL::ToInteger(Sector_SectorTime_Text.DataAttributeGet("record"));
+  BestScore = TextLib::ToInteger(Sector_SectorTime_Text.DataAttributeGet("record"));
   BestCheckpoints = ParseCheckpoints(Sector_SectorTime_Text.DataAttributeGet("record-sectors"));
   BestSource = Sector_SectorTime_Text.DataAttributeGet("record-source");
 
@@ -171,7 +172,10 @@ main() {
       Control.Hide();
     }
   }
-  while(True) {
+***
+
+***Loop***
+***
   // From https://github.com/EvoTM/EvoSC/blob/283b282ef60b18a3ebd9fc7e7d2e3bc181742528/core/Modules/CpDiffs/Templates/widget.latte.xml
     if (GUIPlayer != Null){
       declare wayPointTimesCount = GUIPlayer.RaceWaypointTimes.count;
@@ -188,8 +192,8 @@ main() {
             CurrentCheckpoint = wayPointTimesCount;
             CurrentCheckpointScores.add(GUIPlayer.RaceWaypointTimes[wayPointTimesCount - 1]);
             UpdateInterface();
-		  
-		  
+
+
             if (CurrentCheckpoint >= TotalCheckpoints) { // end of lap (TODO handle multilap)
               CurrentCheckpoint = 0;
               if (! IsSpectating && (BestScore <= 0 || GUIPlayer.RaceWaypointTimes[wayPointTimesCount - 1] < BestScore) && CurrentCheckpointScores.count == TotalCheckpoints) {
@@ -204,6 +208,5 @@ main() {
         LastCpCount = wayPointTimesCount;
       }
     }
-    yield;
-  }
-}
+***
+
