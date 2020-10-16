@@ -3,7 +3,7 @@ MX List Views.
 """
 import asyncio
 import logging
-
+import re
 from pyplanet.views.generics import ManualListView, ask_confirmation
 from pyplanet.apps.contrib.mx.exceptions import MXMapNotFound, MXInvalidResponse
 from datetime import datetime
@@ -271,7 +271,8 @@ class MxSearchListView(ManualListView):
 					return
 
 				row = int(match.group(1))
-				await self.app.instance.command_manager.execute(player, '//mx add {}'.format(self.objects[row]['mxid']))
+				print(self.app.namespace)
+				await self.app.instance.command_manager.execute(player, '//tmx add {}'.format(self.objects[row]['mxid']))
 
 	async def action_install(self, user, values, map, *args, **kwargs):
 		await self.app.instance.command_manager.execute(
