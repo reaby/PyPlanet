@@ -181,3 +181,7 @@ class ChatQuery(Query):
 			if 'Login unknown' in e.faultString:
 				return True  # Ignore
 			raise
+
+	def get_recipients(self):
+		return self._logins
+

@@ -34,6 +34,7 @@ class PlayerManager(CoreContrib):
 
 		Don't initiate this class yourself.
 	"""
+
 	def __init__(self, instance):
 		"""
 		Initiate, should only be done from the core instance.
@@ -153,7 +154,8 @@ class PlayerManager(CoreContrib):
 			player = await Player.get_by_login(login)
 			player.last_ip = ip
 			player.last_seen = datetime.datetime.now()
-			player.nickname = info['NickName']
+			if not player.nickname_override:
+				player.nickname = info['NickName']
 			if is_owner:
 				player.level = Player.LEVEL_MASTER
 			await player.save()
@@ -190,7 +192,8 @@ class PlayerManager(CoreContrib):
 
 		return player
 
-	async def handle_info_change(self, player, is_spectator, is_temp_spectator, is_pure_spectator, target, team_id, **kwargs):
+	async def handle_info_change(self, player, is_spectator, is_temp_spectator, is_pure_spectator, target, team_id,
+								 **kwargs):
 		if not player:
 			return
 
@@ -332,7 +335,7 @@ class PlayerManager(CoreContrib):
 			)
 		if not filename:
 			filename = setting.format(server_login=self._instance.game.server_player_login)
-		
+
 		try:
 			await self._instance.gbx('SaveBlackList', filename)
 		except Exception as e:
@@ -367,7 +370,6 @@ class PlayerManager(CoreContrib):
 			logging.exception(e)
 			raise StorageException('Can\'t save guestlist file to \'{}\'!'.format(filename)) from e
 
-
 	async def load_guestlist(self, filename=None):
 		"""
 		Load guestlist file.
@@ -394,9 +396,10 @@ class PlayerManager(CoreContrib):
 			self._instance.gbx('LoadGuestList', filename)
 		except Exception as e:
 			logging.exception(e)
-			raise StorageException('Can\'t load guestlist according the dedicated server, tried loading from \'{}\'!'.format(
-				filename
-			)) from e
+			raise StorageException(
+				'Can\'t load guestlist according the dedicated server, tried loading from \'{}\'!'.format(
+					filename
+				)) from e
 
 	async def load_blacklist(self, filename=None):
 		"""
@@ -424,9 +427,10 @@ class PlayerManager(CoreContrib):
 			self._instance.gbx('LoadBlackList', filename)
 		except Exception as e:
 			logging.exception(e)
-			raise StorageException('Can\'t load blacklist according the dedicated server, tried loading from \'{}\'!'.format(
-				filename
-			)) from e
+			raise StorageException(
+				'Can\'t load blacklist according the dedicated server, tried loading from \'{}\'!'.format(
+					filename
+				)) from e
 
 	@property
 	def online(self):

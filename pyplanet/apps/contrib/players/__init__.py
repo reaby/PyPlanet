@@ -5,6 +5,7 @@ from pyplanet.apps.contrib.players.views import PlayerListView
 from pyplanet.apps.core.maniaplanet.callbacks import player as player_signals
 from pyplanet.contrib.player.exceptions import PlayerNotFound
 from pyplanet.contrib.setting import Setting
+from pyplanet.apps.core.maniaplanet.models import Player as PlayerModel
 
 
 class Players(AppConfig):
@@ -29,6 +30,8 @@ class Players(AppConfig):
 			Command(command='players', target=self.player_list, description='Displays the list of players currently online.'),
 			Command(command='laston', aliases=['lastseen'], target=self.command_laston,
 					description='Displays the last time the provided player was online on this server.').add_param(name='login', required=True),
+			Command(command='setname', target=self.command_setname,
+					description='Sets custom nickname').add_param(name="name", required=False)
 		)
 		await self.context.setting.register(
 			self.setting_enable_join_msg, self.setting_enable_leave_msg
@@ -52,6 +55,31 @@ class Players(AppConfig):
 				await self.instance.chat(message, player)
 		except PlayerNotFound:
 			message = '$i$f00Unknown login!'
+			await self.instance.chat(message, player)
+
+	async def command_setname(self, player, data, **kwargs):
+		try:
+			db_player = await PlayerModel.get_by_login(player.login)
+			if db_player is not None:
+				if data.name is not None:
+					old_nickname = player.nickname
+					db_player.nickname = data.name
+					db_player.nickname_override = True
+					await db_player.save()
+					await self.instance.player_manager.handle_disconnect(player.login)
+					await self.instance.player_manager.handle_connect(player.login)
+					message = '$ff0Player $fff{}$z$s$ff0 is now known as $fff{}$z$s$ff0.'.format(old_nickname, data.name)
+					await self.instance.chat(message, player)
+				else:
+					message = '$ff0Nickname reverted to default.'
+					db_player.nickname_override = False
+					await db_player.save()
+					await self.instance.player_manager.handle_disconnect(player.login)
+					await self.instance.player_manager.handle_connect(player.login)
+					await self.instance.chat(message, player)
+		except PlayerNotFound:
+			message = '$i$f00 player not found.'
+
 			await self.instance.chat(message, player)
 
 	async def player_connect(self, player, **kwargs):
@@ -79,3 +107,4 @@ class Players(AppConfig):
 				'Nation: $fff{}'.format(player.flow.zone.country) if player.flow.zone else ''
 			)
 		)
+

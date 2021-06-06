@@ -59,6 +59,11 @@ class Player(TimedModel):
 	the name of the level.
 	"""
 
+	nickname_override = BooleanField(default=False, null=False)
+	"""
+	Indicates, if player nickname should be handled manually
+	"""
+
 	CACHE = dict()
 
 	def __str__(self):
