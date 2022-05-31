@@ -189,8 +189,8 @@ class MX(AppConfig):  # pragma: no cover
 			await self.instance.chat('$ff0{}: Installing mappack... This can take a while.'.format(self.site_short_name), player)
 			await self.add_mx_map(player, mock(maps=mx_ids))
 			await self.instance.chat('$ff0{}: Done Installing mappack!'.format(self.site_short_name), player)
-		except MXMapNotFound:
-			message = '$ff0Error: Can\'t add map pack from {}, due error.'.format(self.site_short_name)
+		except MXMapNotFound as e:
+			message = '$ff0Error: Can\'t add map pack from {}, due error:$fff {}'.format(self.site_short_name, e)
 			await self.instance.chat(message, player)
 
 	async def add_mx_map(self, player, data, **kwargs):

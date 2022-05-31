@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class _ManiaLink:
 	def __init__(
 		self, manager=None, id=None, version='3', body=None, template=None, timeout=0, hide_click=False, data=None,
-		player_data=None, disable_alt_menu=False, throw_exceptions=False, relaxed_updating=False,
+		player_data=None, disable_alt_menu=False, throw_exceptions=False, relaxed_updating=False, layer="normal", attachid=""
 	):
 		"""
 		Create manialink (USE THE MANAGER CREATE, DONT INIT DIRECTLY!
@@ -36,6 +36,7 @@ class _ManiaLink:
 		:type id: str
 		:type version: str
 		:type timeout: int
+		:type layer: str layer to display manialink, possible values can be "normal", "ScoresTable", "ScreenIn3d", "altmenu", "cutscene"
 		"""
 		self.manager = manager
 		self.id = id or uuid.uuid4().hex
@@ -49,7 +50,8 @@ class _ManiaLink:
 		self.throw_exceptions = False
 		self.disable_alt_menu = bool(disable_alt_menu)
 		self.relaxed_updating = relaxed_updating
-
+		self.layer = layer
+		self.attachid = attachid
 		self.receivers = dict()
 		self._is_global_shown = False
 		self._is_player_shown = dict()  # Holds per player login a boolean if the ml is shown.

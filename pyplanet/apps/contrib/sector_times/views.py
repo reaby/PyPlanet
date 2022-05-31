@@ -22,7 +22,7 @@ class SectorTimesWidget(WidgetView):
 	def widget_x(self):
 		if self.app:
 			if self.app.instance.game.game == 'tmnext':
-				return -55
+				return 20
 		return 20
 
 	async def get_per_player_data(self, login):

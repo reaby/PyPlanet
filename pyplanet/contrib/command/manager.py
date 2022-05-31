@@ -1,5 +1,5 @@
 import textwrap
-
+import re
 from pyplanet.contrib import CoreContrib
 from pyplanet.contrib.command.command import Command
 

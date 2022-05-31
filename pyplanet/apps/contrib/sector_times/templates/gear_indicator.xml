@@ -4,5 +4,9 @@
 </frame>
 
 {% block maniascript %}
-  <script><!--{% include 'sector_times/gear_indicator.Script.Txt' %}--></script>
+  {% if _game.game == 'tm' %}
+    <script><!--{% include 'sector_times/gear_indicator.Script.Txt' %}--></script>
+  {% elif _game.game == 'tmnext' %}
+    <script><!--{% include 'sector_times/gear_indicator_next.Script.Txt' %}--></script>
+  {% endif %}
 {% endblock %}

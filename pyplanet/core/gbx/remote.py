@@ -20,10 +20,10 @@ class GbxRemote:
 	"""
 	The GbxClient holds the connection to the dedicated server. Maintains the queries and the handlers it got.
 	"""
-	MAX_REQUEST_SIZE  = 2000000  # 2MB
+	MAX_REQUEST_SIZE = 2000000  # 2MB
 	MAX_RESPONSE_SIZE = 4000000  # 4MB
 
-	def __init__(self, host, port, event_pool=None, user=None, password=None, api_version='2013-04-16', instance=None):
+	def __init__(self, host, port, event_pool=None, user=None, password=None, api_version='2022-03-21', instance=None):
 		"""
 		Initiate the GbxRemote client.
 
@@ -142,14 +142,14 @@ class GbxRemote:
 		)
 		self.dedicated_version = versions['Version']
 		self.dedicated_build = versions['Build']
-		#Make a check for SystemInformation if Dedicated = True
+		# Make a check for SystemInformation if Dedicated = True
 		system_info = await self.execute('GetSystemInfo')
 		if system_info['IsDedicated'] == False and system_info['IsServer'] == False:
 			logger.debug('Dedicated seems to be a gameclient! Adjust `PORT` in /settings/base.py')
 			exit(50)
-		
+
 		# Check for scripted mode.
-		mode = await self.execute('GetGameMode')
+		mode = 0
 		settings = await self.execute('GetModeScriptSettings')
 		if mode == 0:
 			if 'S_UseScriptCallbacks' in settings:
@@ -231,7 +231,8 @@ class GbxRemote:
 				self.event_loop.create_task(self.handle_payload(handle, method, data, fault))
 		except ConnectionResetError as e:
 			logger.critical(
-				'Connection with the dedicated server has been closed, we will now close down the subprocess! {}'.format(str(e))
+				'Connection with the dedicated server has been closed, we will now close down the subprocess! {}'.format(
+					str(e))
 			)
 			# When the connection has been reset, we will close the controller process so it can be restarted by the god
 			# process. Exit code 10 gives the information to the god process.
@@ -259,12 +260,14 @@ class GbxRemote:
 			else:
 				await self.handle_callback(handle_nr, method, data)
 		elif fault is not None:
-			raise TransportException('Handle payload got invalid parameters, see fault exception! {}'.format(fault)) from fault
+			raise TransportException(
+				'Handle payload got invalid parameters, see fault exception! {}'.format(fault)) from fault
 		else:
 			print(method, handle_nr, data)
-			logging.warning('Received gbx data, but handle wasn\'t known or payload invalid: handle_nr: {}, method: {}'.format(
-				handle_nr, method,
-			))
+			logging.warning(
+				'Received gbx data, but handle wasn\'t known or payload invalid: handle_nr: {}, method: {}'.format(
+					handle_nr, method,
+				))
 
 	async def handle_response(self, handle_nr, method=None, data=None, fault=None):
 		logger.debug('GBX: Received response to handler {}, method: {}'.format(handle_nr, method))
@@ -293,7 +296,8 @@ class GbxRemote:
 		# Show warning when using non-supported modes.
 		try:
 			if 'LibXmlRpc' in method:
-				logger.warning('You are using an older gamemode script that isn\'t supported by PyPlanet (usage of LibXmlRpc_)')
+				logger.warning(
+					'You are using an older gamemode script that isn\'t supported by PyPlanet (usage of LibXmlRpc_)')
 		except:
 			pass
 
@@ -316,14 +320,17 @@ class GbxRemote:
 			response_id = payload['responseid']
 
 			if response_id in self.script_handlers:
-				logger.debug('GBX: Received scripted response to method: {} and responseid: {}'.format(method, response_id))
+				logger.debug(
+					'GBX: Received scripted response to method: {} and responseid: {}'.format(method, response_id))
 				handler = self.script_handlers.pop(response_id)
 				handler.set_result(payload)
 				handler.done()
 				return
 			else:
 				# We don't have this handler registered, throw warning in console.
-				logger.warning('GBX: Received scripted response with responseid, but no hander was registered! Payload: {}'.format(payload))
+				logger.warning(
+					'GBX: Received scripted response with responseid, but no hander was registered! Payload: {}'.format(
+						payload))
 				return
 
 		# If not, we should just throw it as an ordinary callback.

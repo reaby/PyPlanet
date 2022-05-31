@@ -36,7 +36,7 @@ class BestCpTimes(AppConfig):
 		laptime = int(raw['laptime'])
 
 		# Ignore invalid times (cp time will be 0)
-		if laptime == 0:
+		if laptime <= 0:
 			return
 
 		pcp = PlayerCP(player, cpnm + 1, laptime)

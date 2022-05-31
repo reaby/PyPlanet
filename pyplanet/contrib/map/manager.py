@@ -87,7 +87,7 @@ class MapManager(CoreContrib):
 			environment=info['Environnement'], map_type=info['MapType'], map_style=info['MapStyle'],
 			num_laps=info['NbLaps'], num_checkpoints=info['NbCheckpoints'], time_author=info['AuthorTime'],
 			time_bronze=info['BronzeTime'], time_silver=info['SilverTime'], time_gold=info['GoldTime'],
-			price=info['CopperPrice'], mx_id=mx_id,
+			price=info['CopperPrice'], mx_id=mx_id, author_nickname=info['AuthorNickname']
 		)
 		self._previous_map = self._current_map
 		self._current_map = map_info
@@ -158,7 +158,7 @@ class MapManager(CoreContrib):
 				rows.append(dict(
 					uid=details['UId'], file=details['FileName'], name=name, author_login=details['Author'],
 					environment=details['Environnement'], time_gold=details['GoldTime'], price=details['CopperPrice'],
-					map_type=details['MapType'], map_style=details['MapStyle'], mx_id=mx_id
+					map_type=details['MapType'], map_style=details['MapStyle'], mx_id=mx_id, author_nickname=details['AuthorNickname']
 				))
 
 			if len(rows) > 0:
@@ -201,7 +201,7 @@ class MapManager(CoreContrib):
 							details['UId'], details['FileName'], details['Name'], details['Author'],
 							environment=details['Environnement'], time_gold=details['GoldTime'],
 							price=details['CopperPrice'], map_type=details['MapType'], map_style=details['MapStyle'],
-							mx_id=mx_id,
+							mx_id=mx_id, author_nickname=details['AuthorNickname']
 						)
 						self._maps.add(map_instance)
 						updated.append(map_instance)
@@ -419,7 +419,7 @@ class MapManager(CoreContrib):
 	async def _override_timelimit(self, filename):
 		"""
 		Called to overwrite S_TimeLimit in MatchSettings file if the current map is extended
-		
+
 		:param filename: Give the filename of the matchsettings.
 		"""
 		if self._is_extended and self._original_ta:

@@ -2,6 +2,7 @@
 The MX API client class.
 """
 import asyncio
+import json
 import logging
 import aiohttp
 import re
@@ -30,7 +31,7 @@ class MXApi:
 			if api:
 				return 'https://trackmania.exchange/api'
 			return 'https://trackmania.exchange'
-		elif self.site == 'sm':	
+		elif self.site == 'sm':
 			if api:
 				return 'https://api.mania-exchange.com/sm'
 			return 'https://sm.mania-exchange.com'
@@ -47,7 +48,7 @@ class MXApi:
 	async def close_session(self):
 		if self.session and hasattr(self.session, '__aexit__'):
 			await self.session.__aexit__()
-	
+
 	async def mx_random(self):
 		# Regular Expression to extract the MX-ID from a /tracksearch2/random/.
 		mx_pattern = r'\d+'
@@ -59,7 +60,7 @@ class MXApi:
 		if not matches:
 			return None
 		return str(matches.group(0))
-	
+
 	async def search(self, options, **kwargs):
 		if options is None:
 			options = {
@@ -130,7 +131,8 @@ class MXApi:
 			ids = [ids]
 
 		# Split the map identifiers into groups, as the ManiaExchange API only accepts a limited amount of maps in one request.
-		split_map_ids = [ids[i * self.map_info_page_size:(i + 1) * self.map_info_page_size] for i in range((len(ids) + self.map_info_page_size - 1) // self.map_info_page_size)]
+		split_map_ids = [ids[i * self.map_info_page_size:(i + 1) * self.map_info_page_size] for i in
+						 range((len(ids) + self.map_info_page_size - 1) // self.map_info_page_size)]
 		split_results = list()
 		coros = list()
 		for split_ids in split_map_ids:
@@ -139,9 +141,9 @@ class MXApi:
 
 		# Join the multiple result lists back into one list.
 		return [map for map_list in split_results for map in map_list]
-	
+
 	async def map_offline_record(self, trackid):
-		
+
 		url = '{base}/replays/get_replays/{id}/1'.format(base=self.base_url(True), id=trackid)
 		params = {'key': self.key} if self.key else {}
 		response = await self.session.get(url, params=params)
@@ -155,7 +157,7 @@ class MXApi:
 		for info in await response.json():
 			record.append((info))
 		return record
-	
+
 	async def map_offline_records(self, trackid):
 		url = '{base}/replays/get_replays/{id}/10'.format(base=self.base_url(True), id=trackid)
 		response = await self.session.get(url)
@@ -170,14 +172,14 @@ class MXApi:
 			print(info)
 			record.append((info))
 		return record
-	
+
 	async def map_info_page(self, *ids):
 		if self.site != 'sm':
 			url = '{base}/maps/get_map_info/multi/{ids}'.format(
-			base=self.base_url(True),
-			ids=','.join(str(i) for i in ids[0])
+				base=self.base_url(True),
+				ids=','.join(str(i) for i in ids[0])
 			)
-			
+
 		else:
 			url = '{base}/maps/{ids}'.format(
 				base=self.base_url(True),
@@ -202,7 +204,7 @@ class MXApi:
 		return maps
 
 	async def pack_info(self, id, token):
-		url = '{base}/api/mappack/get_info/{id}?token={token}&secret={token}'.format(
+		url = '{base}/api/mappack/get_info/{id}?secret={token}'.format(
 			base=self.base_url(),
 			id=id,
 			token=token
@@ -219,7 +221,7 @@ class MXApi:
 		return response.json()
 
 	async def get_pack_ids(self, pack_id, token):
-		url = '{base}/api/mappack/get_mappack_tracks/{id}?token={token}'.format(
+		url = '{base}/api/mappack/get_mappack_tracks/{id}?secret={token}'.format(
 			base=self.base_url(),
 			id=pack_id,
 			token=token
@@ -232,12 +234,17 @@ class MXApi:
 			raise MXInvalidResponse('Got invalid response status from ManiaExchange: {}'.format(response.status))
 		maps = list()
 		if response.content_length > 0:
-			for info in await response.json():
-				# Parse some differences between the api game endpoints.
-				mx_id = info['TrackID']
-				maps.append((mx_id, info))
+			try:
+				for info in await response.json():
+					# Parse some differences between the api game endpoints.
+					if type(info) is str and info == "Exception":
+						raise MXMapNotFound("MX error: wrong token for maplist")
+					mx_id = info['TrackID'] if 'TrackID' in info else info['MapID']
+					maps.append((mx_id, info))
 
-			return maps
+				return maps
+			except json.JSONDecodeError as e:
+				raise MXMapNotFound("Error.")
 		else:
 			raise MXMapNotFound("Mx returned with empty response.")
 

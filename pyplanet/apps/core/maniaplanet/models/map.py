@@ -152,7 +152,7 @@ class Map(TimedModel):
 
 		# Update from the kwargs.
 		for k, v in kwargs.items():
-			if v is not None and hasattr(map, k) and getattr(map, k) != v:
+			if v is not None and hasattr(map, k) and getattr(map, k) != v and v != "":
 				setattr(map, k, v)
 				needs_save = True
 

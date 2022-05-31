@@ -59,6 +59,26 @@ class Player(TimedModel):
 	the name of the level.
 	"""
 
+	nickname_override = BooleanField(default=False, null=False)
+	"""
+	Indicates, if player nickname should be handled manually
+	"""
+
+	uplay_nickname = CharField(max_length=100, default="", null=True)
+	"""
+	Saved uplay nickname
+	"""
+
+	allow_custom = BooleanField(default=True)
+	"""
+	Lock nickname to default
+	"""
+
+	allow_chat = BooleanField(default=True)
+	"""
+	Allow chatting?
+	"""
+
 	CACHE = dict()
 
 	def __str__(self):

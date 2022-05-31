@@ -71,11 +71,11 @@
                 <{% if field.input %}entry{% else %}label{% endif %} pos="{{ field.left }} -2.5" size="{{ field.width }} 5"
                        textsize="1.2" valign="center2" action="{{ id }}__list_body_{{ outer_loop.index0 }}_{{ loop.index0 }}"
                        {% if field.input %}default{% else %}text{% endif %}="{% if not field.input %}$fff  {% endif %}{% if field.safe %}{{ field_renderer(row, field)|safe }}{% else %}{{ field_renderer(row, field) }}{% endif %}"
-                       focusareacolor1="0000" focusareacolor2="fff2" />
+                       focusareacolor1="0000" focusareacolor2="fff2" {% if field.input %}name="list_item_{{ outer_loop.index0 }}_{{ loop.index0 }}" {% endif %} />
               {% else %}
                 <{% if field.input %}entry{% else %}label{% endif %} pos="{{ field.left }} -2.5" size="{{ field.width }} 5"
                        {% if field.input %}default{% else %}text{% endif %}="{% if not field.input %}$fff  {% endif %}{% if field.safe %}{{ field_renderer(row, field)|safe }}{% else %}{{ field_renderer(row, field) }}{% endif %}"
-                       textsize="1.2" valign="center2" />
+                       textsize="1.2" valign="center2" {% if field.input %}name="list_item_{{ outer_loop.index0 }}_{{ loop.index0 }}" {% endif %} />
               {% endif %}
             {% endif %}
           {% endfor %}

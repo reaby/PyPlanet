@@ -30,9 +30,6 @@ class Vote:
 		self.votes_current.append(player.login)
 
 		await self.fire_added_event(player)
-		if len(self.votes_current) >= self.votes_required:
-			await self.fire_passed_event()
-
 		return True
 
 	async def remove_vote(self, player):

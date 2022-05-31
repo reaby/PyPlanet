@@ -153,7 +153,9 @@ class PlayerManager(CoreContrib):
 			player = await Player.get_by_login(login)
 			player.last_ip = ip
 			player.last_seen = datetime.datetime.now()
-			player.nickname = info['NickName']
+			player.uplay_nickname = info['NickName']
+			if not player.nickname_override:
+				player.nickname = info['NickName']
 			if is_owner:
 				player.level = Player.LEVEL_MASTER
 			await player.save()
@@ -162,6 +164,7 @@ class PlayerManager(CoreContrib):
 			player = await Player.create(
 				login=login,
 				nickname=info['NickName'],
+				uplay_nickname=info['NickName'],
 				last_ip=ip,
 				last_seen=datetime.datetime.now(),
 				level=Player.LEVEL_MASTER if is_owner else Player.LEVEL_PLAYER,
@@ -332,7 +335,7 @@ class PlayerManager(CoreContrib):
 			)
 		if not filename:
 			filename = setting.format(server_login=self._instance.game.server_player_login)
-		
+
 		try:
 			await self._instance.gbx('SaveBlackList', filename)
 		except Exception as e:

@@ -70,7 +70,7 @@ class SectorTimes(AppConfig):
 		await self.cp_widget.hide()
 
 	async def reload_settings(self, *args, **kwargs):
-		if await self.setting_enable_gear_indicator.get_value() and self.gear_view_possible:
+		if await self.setting_enable_gear_indicator.get_value():
 			await self.gear_view.display()
 		else:
 			await self.gear_view.hide()
