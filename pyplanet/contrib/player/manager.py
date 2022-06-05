@@ -34,6 +34,7 @@ class PlayerManager(CoreContrib):
 
 		Don't initiate this class yourself.
 	"""
+
 	def __init__(self, instance):
 		"""
 		Initiate, should only be done from the core instance.
@@ -165,6 +166,9 @@ class PlayerManager(CoreContrib):
 				login=login,
 				nickname=info['NickName'],
 				uplay_nickname=info['NickName'],
+				allow_custom=True,
+				nickname_override=False,
+				allow_chat=True,
 				last_ip=ip,
 				last_seen=datetime.datetime.now(),
 				level=Player.LEVEL_MASTER if is_owner else Player.LEVEL_PLAYER,
@@ -193,7 +197,8 @@ class PlayerManager(CoreContrib):
 
 		return player
 
-	async def handle_info_change(self, player, is_spectator, is_temp_spectator, is_pure_spectator, target, team_id, **kwargs):
+	async def handle_info_change(self, player, is_spectator, is_temp_spectator, is_pure_spectator, target, team_id,
+								 **kwargs):
 		if not player:
 			return
 
@@ -370,7 +375,6 @@ class PlayerManager(CoreContrib):
 			logging.exception(e)
 			raise StorageException('Can\'t save guestlist file to \'{}\'!'.format(filename)) from e
 
-
 	async def load_guestlist(self, filename=None):
 		"""
 		Load guestlist file.
@@ -397,9 +401,10 @@ class PlayerManager(CoreContrib):
 			self._instance.gbx('LoadGuestList', filename)
 		except Exception as e:
 			logging.exception(e)
-			raise StorageException('Can\'t load guestlist according the dedicated server, tried loading from \'{}\'!'.format(
-				filename
-			)) from e
+			raise StorageException(
+				'Can\'t load guestlist according the dedicated server, tried loading from \'{}\'!'.format(
+					filename
+				)) from e
 
 	async def load_blacklist(self, filename=None):
 		"""
@@ -427,9 +432,10 @@ class PlayerManager(CoreContrib):
 			self._instance.gbx('LoadBlackList', filename)
 		except Exception as e:
 			logging.exception(e)
-			raise StorageException('Can\'t load blacklist according the dedicated server, tried loading from \'{}\'!'.format(
-				filename
-			)) from e
+			raise StorageException(
+				'Can\'t load blacklist according the dedicated server, tried loading from \'{}\'!'.format(
+					filename
+				)) from e
 
 	@property
 	def online(self):

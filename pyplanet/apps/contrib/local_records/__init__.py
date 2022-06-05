@@ -131,11 +131,9 @@ class LocalRecords(AppConfig):
 			)
 
 			# Group by map.
-			# Make sure all maps have an entry in the dictionary.
-			for list_map_id in maps:
-				map_locals[list_map_id] = list()
-
 			for row in rows:
+				if row.map_id not in map_locals:
+					map_locals[row.map_id] = list()
 				map_locals[row.map_id].append(row)
 
 			# Map local stats.
@@ -398,8 +396,8 @@ class LocalRecords(AppConfig):
 
 			compare_record = self.current_records[data.record - 1]
 
-			record_index = (self.current_records.index(record[0]) + 1) if len(record) else None
-			compare_index = (self.current_records.index(compare_record) + 1)
+			record_index = self.current_records.index(record[0]) if len(record) else None
+			compare_index = self.current_records.index(compare_record)
 
 		view = views.LocalRecordCpCompareListView(
 			self, record[0] if len(record) else None, record_index, compare_record, compare_index
