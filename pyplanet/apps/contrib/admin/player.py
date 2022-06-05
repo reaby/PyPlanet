@@ -117,9 +117,7 @@ class PlayerAdmin:
 			dest_player = [p for p in self.instance.player_manager.online if p.login == data.login]
 			if not len(dest_player) == 1:
 				raise Exception()
-			message = '$ff0Admin $fff{}$z$s$ff0 has forced $fff{}$z$s$ff0 into player slot.'.format(
-				player.nickname, dest_player[0].nickname
-			)
+			message = '$ff0Admin has forced $fff{}$z$s$ff0 into player slot.'.format(dest_player[0].nickname)
 			await self.instance.gbx('ForceSpectator', dest_player[0].login, 2)
 			await self.instance.gbx.multicall(
 				self.instance.gbx('ForceSpectator', dest_player[0].login, 0),
@@ -153,9 +151,8 @@ class PlayerAdmin:
 			await self.instance.chat(message, player)
 			return
 
-		message = '$ff0Admin $fff{}$z$s$ff0 has forced $fff{}$z$s$ff0 into team $fff{}$ff0.'.format(
-			player.nickname, dest_player[0].nickname, team_name
-		)
+		message = '$ff0Admin has forced $fff{}$z$s$ff0 into team $fff{}$ff0.'.format(dest_player[0].nickname,
+																					 team_name)
 		await self.instance.gbx.multicall(
 			self.instance.gbx('ForcePlayerTeam', dest_player[0].login, new_team),
 			self.instance.chat(message)
@@ -182,12 +179,11 @@ class PlayerAdmin:
 			await self.instance.chat(message, player)
 			return
 
-		message = '$ff0Admin $fff{}$z$s$ff0 has forced $fff{}$z$s$ff0 into team $fff{}$ff0.'.format(
-			player.nickname, dest_player[0].nickname, team_name
-		)
+		message = '$ff0Admin has forced $fff{}$z$s$ff0 into team $fff{}$ff0.'.format(dest_player[0].nickname,
+																					 team_name)
 		await self.instance.gbx.multicall(
 			self.instance.gbx('ForcePlayerTeam', dest_player[0].login, new_team),
-			self.instance.chat(message)
+			self.instance.chat(message, player)
 		)
 
 	async def ignore_player(self, player, data, **kwargs):
@@ -197,10 +193,10 @@ class PlayerAdmin:
 			mute_player = await self.instance.player_manager.get_player(data.login)
 			if mute_player.level >= player.level:
 				raise PermissionError()
-			message = '$ff0Admin $fff{}$z$s$ff0 has muted $fff{}$z$s$ff0.'.format(player.nickname, mute_player.nickname)
+			message = '$ff0Admin has muted $fff{}$z$s$ff0.'.format(mute_player.nickname)
 			await self.instance.gbx.multicall(
 				self.instance.gbx('Ignore', data.login),
-				self.instance.chat(message)
+				self.instance.chat(message, player)
 			)
 		except PlayerNotFound:
 			message = '$i$f00Unknown login!'
@@ -215,10 +211,10 @@ class PlayerAdmin:
 				raise PlayerNotFound()
 
 			unmute_player = await self.instance.player_manager.get_player(data.login)
-			message = '$ff0Admin $fff{}$z$s$ff0 has un-muted $fff{}$z$s$ff0.'.format(player.nickname, unmute_player.nickname)
+			message = '$ff0Admin has un-muted $fff{}$z$s$ff0.'.format(unmute_player.nickname)
 			await self.instance.gbx.multicall(
 				self.instance.gbx('UnIgnore', data.login),
-				self.instance.chat(message)
+				self.instance.chat(message, player)
 			)
 		except PlayerNotFound:
 			message = '$i$f00Unknown login!'
@@ -232,10 +228,10 @@ class PlayerAdmin:
 			if kick_player.level >= player.level:
 				raise PermissionError()
 
-			message = '$ff0Admin $fff{}$z$s$ff0 has kicked $fff{}$z$s$ff0.'.format(player.nickname, kick_player.nickname)
+			message = '$ff0Admin has kicked $fff{}$z$s$ff0.'.format(kick_player.nickname)
 			await self.instance.gbx.multicall(
 				self.instance.gbx('Kick', data.login),
-				self.instance.chat(message)
+				self.instance.chat(message, player)
 			)
 		except PlayerNotFound:
 			message = '$i$f00Unknown login!'
@@ -249,10 +245,10 @@ class PlayerAdmin:
 			ban_player = await self.instance.player_manager.get_player(data.login)
 			if ban_player.level >= player.level:
 				raise PermissionError()
-			message = '$ff0Admin $fff{}$z$s$ff0 has banned $fff{}$z$s$ff0.'.format(player.nickname, ban_player.nickname)
+			message = '$ff0Admin has banned $fff{}$z$s$ff0.'.format(ban_player.nickname)
 			await self.instance.gbx.multicall(
 				self.instance.gbx('Ban', data.login),
-				self.instance.chat(message)
+				self.instance.chat(message, player)
 			)
 		except PlayerNotFound:
 			message = '$i$f00Unknown login!'
@@ -262,10 +258,10 @@ class PlayerAdmin:
 			await self.instance.chat(message, player)
 
 	async def unban_player(self, player, data, **kwargs):
-		message = '$ff0Admin $fff{}$z$s$ff0 has un-banned $fff{}$z$s$ff0.'.format(player.nickname, data.login)
+		message = '$ff0Admin has un-banned $fff{}$z$s$ff0.'.format(data.login)
 		await self.instance.gbx.multicall(
 			self.instance.gbx('UnBan', data.login),
-			self.instance.chat(message)
+			self.instance.chat(message, player)
 		)
 
 	async def addguest_player(self, player, data, **kwargs):
@@ -273,10 +269,10 @@ class PlayerAdmin:
 			guest_player = await self.instance.player_manager.get_player(data.login)
 			if guest_player.level >= player.level:
 				raise PermissionError()
-			message = '$ff0Admin $fff{}$z$s$ff0 has added to the Guestlist: $fff{}$z$s$ff0.'.format(player.nickname, guest_player.nickname)
+			message = '$ff0Admin has added to the Guestlist: $fff{}$z$s$ff0.'.format(guest_player.nickname)
 			await self.instance.gbx.multicall(
 				self.instance.gbx('AddGuest', data.login),
-				self.instance.chat(message)
+				self.instance.chat(message, player)
 			)
 		except PlayerNotFound:
 			message = '$i$f00Unknown login!'
@@ -286,10 +282,10 @@ class PlayerAdmin:
 			await self.instance.chat(message, player)
 
 	async def removeguest_player(self, player, data, **kwargs):
-		message = '$ff0Admin $fff{}$z$s$ff0 has removed from the Guestlist: $fff{}$z$s$ff0.'.format(player.nickname, data.login)
+		message = '$ff0Admin has removed from the Guestlist: $fff{}$z$s$ff0.'.format(data.login)
 		await self.instance.gbx.multicall(
 			self.instance.gbx('RemoveGuest', data.login),
-			self.instance.chat(message)
+			self.instance.chat(message, player)
 		)
 
 	async def blacklist_player(self, player, data, **kwargs):
@@ -298,8 +294,7 @@ class PlayerAdmin:
 			if blacklist_player.level >= player.level:
 				raise PermissionError()
 
-			message = '$ff0Admin $fff{}$z$s$ff0 has blacklisted $fff{}$z$s$ff0.'.format(player.nickname, blacklist_player.nickname)
-
+			message = '$ff0Admin has blacklisted $fff{}$z$s$ff0.'.format(blacklist_player.nickname)
 
 			try:
 				await self.instance.gbx.multicall(
@@ -309,7 +304,7 @@ class PlayerAdmin:
 			except:
 				return await self.instance.chat('$ff0Blacklisting failed!', player)
 
-			await self.instance.chat(message)
+			await self.instance.chat(message, player)
 
 			# Try to save to file.
 			try:
@@ -317,17 +312,17 @@ class PlayerAdmin:
 			except:
 				pass
 		except PlayerNotFound:
-			message = '$ff0Admin $fff{}$z$s$ff0 has blacklisted $fff{}$z$s$ff0.'.format(player.nickname, data.login)
+			message = '$ff0Admin has blacklisted $fff{}$z$s$ff0.'.format(data.login)
 			await self.instance.gbx.multicall(
 				self.instance.gbx('BlackList', data.login),
-				self.instance.chat(message)
+				self.instance.chat(message, player)
 			)
 		except PermissionError:
 			message = '$i$f00Can\'t perform this action on an admin at the same or higher level as you!'
 			await self.instance.chat(message, player)
 
 	async def unblacklist_player(self, player, data, **kwargs):
-		message = '$ff0Admin $fff{}$z$s$ff0 has un-blacklisted $fff{}$z$s$ff0.'.format(player.nickname, data.login)
+		message = '$ff0Admin has un-blacklisted $fff{}$z$s$ff0.'.format(data.login)
 		await self.instance.gbx.multicall(
 			self.instance.gbx('UnBlackList', data.login),
 			self.instance.chat(message)
@@ -407,14 +402,14 @@ class PlayerAdmin:
 		await target_player.save()
 
 		if data.level > 0:
-			message = '$ff0Admin $fff{}$z$s$ff0 has added $fff{}$z$s$ff0 as an {}.'.format(
-				player.nickname, target_player.nickname, new_level_name
+			message = '$ff0Admin has added $fff{}$z$s$ff0 as an {}.'.format(
+				target_player.nickname, new_level_name
 			)
 		else:
-			message = '$ff0Admin $fff{}$z$s$ff0 has removed $fff{}$z$s$ff0 as an {}.'.format(
-				player.nickname, target_player.nickname, old_level_name
+			message = '$ff0Admin has removed $fff{}$z$s$ff0 as an {}.'.format(
+				target_player.nickname, old_level_name
 			)
-		await self.instance.chat(message)
+		await self.instance.chat(message, player)
 
 	async def warn_player(self, player, data, **kwargs):
 		try:
@@ -426,7 +421,7 @@ class PlayerAdmin:
 					'You have just been warned! Ask the present admin for further information and / or potential consequences.',
 					size='sm', buttons=None
 				),
-				self.instance.chat('$ff0Admin $fff{}$z$s$ff0 has warned $fff{}$z$s$ff0.'.format(player.nickname, warn_player.nickname))
+				self.instance.chat('$ff0Admin has warned $fff{}$z$s$ff0.'.format(warn_player.nickname), player)
 			)
 		except PlayerNotFound:
 			message = '$i$f00Unknown login!'

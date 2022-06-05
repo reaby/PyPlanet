@@ -85,7 +85,7 @@ class ServerAdmin:
 		mode = (' '.join(data.mode))
 		lower_mode = mode.lower()
 		if self.instance.game.game == 'tm':
-		
+
 			if lower_mode == 'ta' or lower_mode == 'timeattack':
 				mode = 'TimeAttack.Script.txt'
 			elif lower_mode == 'laps':
@@ -98,9 +98,9 @@ class ServerAdmin:
 				mode = 'Chase.Script.txt'
 			elif lower_mode == 'team':
 				mode = 'Team.Script.txt'
-			
+
 		if self.instance.game.game == 'tmnext':
-		
+
 			if lower_mode == 'ta' or lower_mode == 'timeattack':
 				mode = 'Trackmania/TM_TimeAttack_Online.Script.txt'
 			elif lower_mode == 'laps':
