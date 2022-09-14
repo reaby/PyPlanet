@@ -1,5 +1,6 @@
 import asyncio
 
+from datetime import datetime
 from pyplanet.apps.config import AppConfig
 from pyplanet.apps.contrib.karma.views import KarmaListView
 from pyplanet.contrib.command import Command
@@ -41,6 +42,24 @@ class Karma(AppConfig):
 			default=0
 		)
 
+		self.setting_karma_use_decrease = Setting(
+			'karma_use_decrease', 'Karma use decreasing votes', Setting.CAT_BEHAVIOUR, type=bool,
+			description='Karma use decreasing votes',
+			default=False, change_target=self.setting_update_karma
+		)
+
+		self.setting_karma_decrease_period = Setting(
+			'karma_decrease_period', 'Karma period with decrease', Setting.CAT_BEHAVIOUR, type=int,
+			description='Karma period with decrease, after n days vote power will be decreased to 0',
+			default=180
+		)
+
+		self.setting_karma_no_decrease_days = Setting(
+			'karma_no_decrease_days', 'Karma days with no decrease', Setting.CAT_BEHAVIOUR, type=int,
+			description='Days without no karma decrease',
+			default=30
+		)
+
 		self.mx_karma = MXKarma(self)
 
 	async def on_start(self):
@@ -54,7 +73,9 @@ class Karma(AppConfig):
 		self.context.signals.listen(mp_signals.player.player_chat, self.player_chat)
 		self.context.signals.listen(mp_signals.player.player_connect, self.player_connect)
 
-		await self.context.setting.register(self.setting_finishes_before_voting, self.setting_expanded_voting)
+		await self.context.setting.register(self.setting_finishes_before_voting, self.setting_expanded_voting,
+											self.setting_karma_use_decrease, self.setting_karma_decrease_period,
+											self.setting_karma_no_decrease_days)
 
 		# Load initial data.
 		await self.get_votes_list(self.instance.map_manager.current_map)
@@ -67,6 +88,13 @@ class Karma(AppConfig):
 		await self.widget.display()
 
 		await self.load_map_votes()
+
+	async def setting_update_karma(self, oldval, newval):
+		await self.get_votes_list(self.instance.map_manager.current_map)
+		await self.calculate_karma()
+		await self.mx_karma.map_begin(self.instance.map_manager.current_map)
+		await self.chat_current_karma()
+		await self.widget.display()
 
 	async def on_stop(self):
 		await self.mx_karma.on_stop()
@@ -188,6 +216,7 @@ class Karma(AppConfig):
 						)
 					else:
 						message = '$ff0You have already voted $fff{}$ff0 on this map!'.format(text)
+						await player_vote.save()
 						await self.instance.chat(message, player)
 				else:
 					new_vote = KarmaModel(map=self.instance.map_manager.current_map, player=player, score=normal_score, expanded_score=score)
@@ -211,15 +240,37 @@ class Karma(AppConfig):
 				# Reload map referenced information
 				asyncio.ensure_future(self.load_map_votes(map=self.instance.map_manager.current_map))
 
+	async def get_weighted_score(self, vote):
+		enabled = await self.setting_karma_use_decrease.get_value()
+		score = 0.0
+		if vote.expanded_score is not None:
+			score = vote.expanded_score
+		else:
+			score = vote.score
+
+		if not enabled:
+			return score
+		no_decrease_days = await self.setting_karma_no_decrease_days.get_value()
+		decrease_period = await self.setting_karma_decrease_period.get_value()
+
+		days = (datetime.now() - vote.updated_at).days
+		if days <= no_decrease_days:
+			return score
+		else:
+			power = (decrease_period - (days-no_decrease_days)) / decrease_period
+			if power > 0:
+				return score * power
+			return None
+
 	async def get_map_karma(self, map):
 		vote_list = await KarmaModel.objects.execute(KarmaModel.select().where(KarmaModel.map_id == map.get_id()))
 
 		total_score = 0.0
 		for vote in vote_list:
-			if vote.expanded_score is not None:
-				total_score += vote.expanded_score
-			else:
-				total_score += vote.score
+			score = await self.get_weighted_score(vote)
+			if score is None:
+				continue
+			total_score += score
 
 		return dict(
 			vote_count=len(vote_list),
@@ -235,17 +286,19 @@ class Karma(AppConfig):
 		total_abs = 0.0
 		self.current_karma_positive = 0.0
 		self.current_karma_negative = 0.0
+		votes_new = []
 
 		for vote in self.current_votes:
-			score = vote.score
-			if vote.expanded_score is not None:
-				score = vote.expanded_score
-
+			score = await self.get_weighted_score(vote)
+			if score is None:
+				continue
+			votes_new.append(vote)
 			total_score += score
 			total_abs += abs(score)
 			if score > 0:
 				self.current_karma_positive += score
 
+		self.current_votes = votes_new
 		self.current_karma_negative = (total_abs - self.current_karma_positive)
 		self.current_karma = total_score
 		self.current_karma_percentage = 0
@@ -255,10 +308,10 @@ class Karma(AppConfig):
 	async def chat_current_karma(self):
 		mx_karma = ''
 		if self.mx_karma.api.activated:
-			mx_karma = ', MX: $fff{}%$ff0 [$fff{}$ff0 votes]'.format(round(self.mx_karma.current_average, 1), self.mx_karma.current_count)
+			mx_karma = ', MX: $fff{}%$ff0 [$fff{}$ff0 votes]'.format(round(self.mx_karma.current_average*10)/10, self.mx_karma.current_count)
 
 		num_current_votes = len(self.current_votes)
 		message = '$ff0Current map karma: $fff{}$ff0 ($fff{}%$ff0) [$fff{}$ff0 votes]{}'.format(
-			self.current_karma, round(self.current_karma_percentage * 100, 2), num_current_votes, mx_karma
+			round(self.current_karma, 1), round(self.current_karma_percentage * 100,2), num_current_votes, mx_karma
 		)
 		await self.instance.chat(message)

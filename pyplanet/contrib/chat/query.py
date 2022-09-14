@@ -1,4 +1,5 @@
 import collections
+import asyncio
 
 from xmlrpc.client import Fault
 
@@ -159,6 +160,7 @@ class ChatQuery(Query):
 		:return: Prepared GBX query.
 		:rtype: pyplanet.core.gbx.query.Query
 		"""
+
 		method = 'ChatSendServerMessage'
 		args = list()
 		args.append(self.get_formatted_message())
@@ -176,7 +178,12 @@ class ChatQuery(Query):
 		:return: Result of query.
 		"""
 		try:
-			return await self.gbx_query.execute()
+			asyncio.ensure_future(
+				self.chat_manager.controller_chat.send(dict(text=self.get_formatted_message(), logins=self._logins),
+													   True)
+			)
+			if not self.chat_manager.gbx_mute:
+				return await self.gbx_query.execute()
 		except Fault as e:
 			if 'Login unknown' in e.faultString:
 				return True  # Ignore
@@ -184,4 +191,3 @@ class ChatQuery(Query):
 
 	def get_recipients(self):
 		return self._logins
-

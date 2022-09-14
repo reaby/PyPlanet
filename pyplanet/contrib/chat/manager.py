@@ -16,6 +16,7 @@ class ChatManager(CoreContrib):
 		:param instance: Instance.
 		:type instance: pyplanet.core.instance.Instance
 		"""
+		self.gbx_mute = False
 		self.instance = instance
 		self.controller_chat = Signal(code="chat", namespace="pyplanet")
 		self.instance.signals.register_signal(signal=self.controller_chat)
@@ -28,11 +29,10 @@ class ChatManager(CoreContrib):
 		if len(args) > 1:
 			query.to_players(args[1:])
 
-		asyncio.ensure_future(
-			self.controller_chat.send(dict(text=query.get_formatted_message(), logins=query.get_recipients()), True)
-		)
-
 		return query
+
+	def mute(self, mute):
+		self.gbx_mute = mute
 
 	def prepare(self, message=None, raw=False):
 		"""
@@ -63,16 +63,6 @@ class ChatManager(CoreContrib):
 		:param queries: One or more query instances or one or multiple strings that gets send as global messages.
 		:return: The results of the multicall.
 		"""
-		for query in queries:
-			if isinstance(query, ChatQuery):
-				out = query.get_formatted_message()
-				logins = query.get_recipients()
-			else:
-				message = self.prepare_raw(str(query))
-				out = message.get_formatted_message()
-				logins = message.get_recipients()
-
-			await self.controller_chat.send(dict(text=out, logins=logins), True)
 
 		return await self.instance.gbx.multicall(
 			*[

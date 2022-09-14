@@ -5,6 +5,7 @@ from pyplanet.apps.contrib.jukebox.views import FolderListView, FolderMapListVie
 from pyplanet.contrib.setting import Setting
 
 from .models import MapFolder as Folders, MapInFolder
+from ..local_records import LocalRecord
 
 
 class FolderManager:
@@ -38,7 +39,9 @@ class FolderManager:
 		})
 
 		if 'local_records' in self.app.instance.apps.apps:
-			self.auto_folders.append({'id': 'local_none', 'name': 'Map record: none', 'owner': 'PyPlanet', 'type': 'auto'})
+			self.auto_folders.append({'id': 'local_norank', 'name': 'Map record: no rank', 'owner': 'PyPlanet', 'type': 'auto'})
+			self.auto_folders.append({'id': 'local_record', 'name': 'Map record: record', 'owner': 'PyPlanet', 'type': 'auto'})
+			#self.auto_folders.append({'id': 'local_none', 'name': 'Map record: none', 'owner': 'PyPlanet', 'type': 'auto'})
 			self.auto_folders.append({'id': 'length_shorter_30s', 'name': 'Map record: below 30 seconds', 'owner': 'PyPlanet', 'type': 'auto'})
 			self.auto_folders.append({'id': 'length_longer_60s', 'name': 'Map record: above 60 seconds', 'owner': 'PyPlanet', 'type': 'auto'})
 
@@ -195,13 +198,12 @@ class FolderManager:
 				.where(Folders.id << folder_ids)
 		)
 
-	async def get_folder_code_contents(self, folder_code):
+	async def get_folder_code_contents(self, folder_code, player):
 		folder = folder_code
 
 		map_list = []
 		fields = []
 		folder_instance = None
-
 		if folder['id'] == 'newest':
 			days_ago = await self.app.setting_newest_days_range.get_value()
 			filter_from = datetime.datetime.now() - datetime.timedelta(days=days_ago)

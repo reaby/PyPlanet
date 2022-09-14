@@ -43,9 +43,9 @@ class ServerAdmin:
 					description='Displays and allows for updating of the gamemode settings.')
 				.add_param(name='setting', required=False)
 				.add_param(name='content', required=False),
-			Command(command='chat', target=self.chat_toggle, perms='admin:chat_toggle', admin=True,
-					description='Enables/disables the chat.')
-				.add_param(name='enable', required=False),
+			#Command(command='chat', target=self.chat_toggle, perms='admin:chat_toggle', admin=True,
+			#		description='Enables/disables the chat.')
+			#		.add_param(name='enable', required=False),
 		)
 
 		# Register signal receivers.

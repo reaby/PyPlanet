@@ -35,7 +35,8 @@ class Query:
 		:return: Future with results.
 		:rtype: Future<any>
 		"""
-		return await self._client.execute(self.method, *self.args, timeout=self.timeout)
+		if self.method is not None:
+			return await self._client.execute(self.method, *self.args, timeout=self.timeout)
 
 	def __await__(self):
 		"""

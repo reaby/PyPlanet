@@ -1,7 +1,10 @@
+import datetime
+
 from pyplanet.apps.contrib.karma.models import Karma
 from pyplanet.apps.core.maniaplanet.models import Player
 from pyplanet.views.generics.widget import WidgetView
 from pyplanet.views.generics.list import ManualListView
+from pyplanet.utils.style import style_strip, STRIP_COLORS
 
 
 class KarmaWidget(WidgetView):
@@ -87,7 +90,23 @@ class KarmaListView(ManualListView):
 			'searching': False,
 			'width': 30,
 			'type': 'label'
-		}
+		},
+		{
+			'name': 'Vote age',
+			'index': 'days',
+			'sorting': True,
+			'searching': False,
+			'width': 30,
+			'type': 'label'
+		},
+		{
+			'name': 'Vote power',
+			'index': 'power',
+			'sorting': True,
+			'searching': False,
+			'width': 30,
+			'type': 'label'
+		},
 	]
 
 	def __init__(self, app, map):
@@ -110,19 +129,23 @@ class KarmaListView(ManualListView):
 		votes = []
 		for item in karma:
 			score = item.score
+			power = await self.app.get_weighted_score(item)
+			days = (datetime.datetime.now() - item.updated_at).days
+			if power is None:
+				continue
 			if item.expanded_score is not None:
 				score = item.expanded_score
 
-			vote = '+-'
+			vote = '$ff0+-'
 			if score == 1:
-				vote = '++'
+				vote = '$0f0++'
 			elif score == 0.5:
-				vote = '+'
+				vote = '$0d0+'
 			elif score == -0.5:
-				vote = '-'
+				vote = '$d00-'
 			elif score == -1:
-				vote = '--'
+				vote = '$f00--'
 
-			votes.append({'nickname': item.player.nickname, 'vote': vote})
+			votes.append({'nickname': item.player.nickname, 'vote': vote, 'power': round(power, 2), 'days': str(days) + " days"})
 
 		return votes

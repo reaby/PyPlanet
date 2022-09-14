@@ -345,7 +345,7 @@ class FolderMapListView(MapListView):
 			return self.cache
 
 		self.fields, self.map_list, self.folder_info, self.folder_instance = \
-			await self.folder_manager.get_folder_code_contents(self.folder_code)
+			await self.folder_manager.get_folder_code_contents(self.folder_code, self.player)
 
 		self.title = 'Folder: ' + self.folder_info['name']
 
