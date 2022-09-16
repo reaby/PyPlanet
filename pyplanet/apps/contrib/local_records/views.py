@@ -81,7 +81,7 @@ class LocalRecordsWidget(TimesWidgetView):
 
 			index = 1
 			for record in records:
-				record_player = await record.get_related('player')
+				record_player = record.player
 				list_record = dict()
 				list_record['index'] = index
 				list_record['color'] = '$fff'
@@ -123,7 +123,7 @@ class LocalRecordsWidget(TimesWidgetView):
 
 			index = 1
 			for record in records:
-				record_player = await record.get_related('player')
+				record_player = record.player
 				list_record = dict()
 				list_record['index'] = index
 				list_record['color'] = '$fff'
