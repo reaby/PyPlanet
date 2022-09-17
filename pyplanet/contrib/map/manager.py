@@ -89,7 +89,7 @@ class MapManager(CoreContrib):
 			file=info['FileName'], environment=info['Environnement'], map_type=info['MapType'], map_style=info['MapStyle'],
 			num_laps=info['NbLaps'], num_checkpoints=info['NbCheckpoints'], time_author=info['AuthorTime'],
 			time_bronze=info['BronzeTime'], time_silver=info['SilverTime'], time_gold=info['GoldTime'],
-			price=info['CopperPrice'], mx_id=mx_id, author_nickname=info['AuthorNickname']
+			price=info['CopperPrice'], mx_id=mx_id
 		)
 		self._previous_map = self._current_map
 		self._current_map = map_info
@@ -223,7 +223,7 @@ class MapManager(CoreContrib):
 							details['UId'], details['FileName'], details['Name'], details['Author'],
 							author_nickname=author_nickname, environment=details['Environnement'], time_gold=details['GoldTime'],
 							price=details['CopperPrice'], map_type=details['MapType'], map_style=details['MapStyle'],
-							mx_id=mx_id, author_nickname=details['AuthorNickname']
+							mx_id=mx_id
 						)
 						self._maps.add(map_instance)
 						updated.append(map_instance)
