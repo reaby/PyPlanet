@@ -41,7 +41,7 @@ class MapManager(CoreContrib):
 		self._matchsettings = None
 
 		# The maps contain a list of map instances in the order that are in the current loaded list.
-		self._maps = set()
+		self._maps = list()
 
 		# The current map will always be in this variable. The next map will always be here. It will be updated. once
 		# it's updated it should be send to the dedicated to queue the next map.
@@ -57,16 +57,16 @@ class MapManager(CoreContrib):
 		self._mx_id_regex = re.compile('(?:PyPlanet-MX\\/)([A-Z]{2})-(\\d+)\\.')
 
 	async def on_start(self):
-		self._instance.signals.listen('maniaplanet:playlist_modified', lambda: '')
+		# self._instance.signals.listen('maniaplanet:playlist_modified', lambda: '')
 		self._instance.signals.listen('maniaplanet:podium_start', self._podium_start)
 
 		# Fully update list + database.
 		await self.update_list(full_update=True)
 
 		# Get current and next map.
-		self._current_map, self._next_map = await asyncio.gather(
-			self.handle_map_change(await self._instance.gbx('GetCurrentMapInfo')),
+		self._next_map, self._current_map = await asyncio.gather(
 			self.handle_map_change(await self._instance.gbx('GetNextMapInfo')),
+			self.handle_map_change(await self._instance.gbx('GetCurrentMapInfo')),
 		)
 		self._previous_map = None
 
@@ -187,24 +187,31 @@ class MapManager(CoreContrib):
 					Map.select().where(Map.uid << [m['uid'] for m in rows])
 				))
 
+			# sort maps so they appear with the order of server
+			sorted_maps = []
+			for raw_map in raw_list:
+				db_map = [m for m in maps if m.uid == raw_map['UId']][0]
+				if db_map:
+					sorted_maps.append(db_map)
+
 			async with self.lock:
-				self._maps = set(maps)
+				self._maps = sorted_maps
 
 			# Reload locals for all maps.
 			# TODO: Find better way to remove this and handle it on the folders way.
 			coroutines = list()
-			if 'local_records' in self._instance.apps.apps:
-				if detach_fks:
-					asyncio.ensure_future(self._instance.apps.apps['local_records'].load_map_locals())
-				else:
-					coroutines.append(self._instance.apps.apps['local_records'].load_map_locals())
+			#if 'local_records' in self._instance.apps.apps:
+			#	if detach_fks:
+			#		asyncio.ensure_future(self._instance.apps.apps['local_records'].load_map_locals())
+			#	else:
+			#		coroutines.append(self._instance.apps.apps['local_records'].load_map_locals())
 
 			# Reload karma for all maps.
-			if 'karma' in self._instance.apps.apps:
-				if detach_fks:
-					asyncio.ensure_future(self._instance.apps.apps['karma'].load_map_votes())
-				else:
-					coroutines.append(self._instance.apps.apps['karma'].load_map_votes())
+			#if 'karma' in self._instance.apps.apps:
+			#	if detach_fks:
+			#		asyncio.ensure_future(self._instance.apps.apps['karma'].load_map_votes())
+			#	else:
+			#		coroutines.append(self._instance.apps.apps['karma'].load_map_votes())
 
 			if coroutines:
 				await asyncio.gather(*coroutines)
@@ -225,7 +232,7 @@ class MapManager(CoreContrib):
 							price=details['CopperPrice'], map_type=details['MapType'], map_style=details['MapStyle'],
 							mx_id=mx_id
 						)
-						self._maps.add(map_instance)
+						self._maps.append(map_instance)
 						updated.append(map_instance)
 		return updated
 
@@ -255,6 +262,10 @@ class MapManager(CoreContrib):
 		:param uid: By uid (pk).
 		:return: Player or exception if not found
 		"""
+		for map_instance in self.maps:
+			if map_instance.uid == uid:
+				return map_instance
+
 		try:
 			return await Map.get_by_uid(uid)
 		except DoesNotExist:

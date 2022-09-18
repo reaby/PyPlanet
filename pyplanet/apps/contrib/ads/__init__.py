@@ -73,12 +73,12 @@ class Ads(AppConfig):
 		self.context.signals.listen(mp_signals.player.player_connect, self.on_connect)
 
 		# Register commands.
-		await self.instance.command_manager.register(
-			Command(command='paypal', target=self.chat_paypal, admin=False)
-		)
-		await self.instance.command_manager.register(
-			Command(command='discord', target=self.chat_discord, admin=False),
-		)
+		# await self.instance.command_manager.register(
+		#	Command(command='paypal', target=self.chat_paypal, admin=False)
+		# )
+		# await self.instance.command_manager.register(
+		#	Command(command='discord', target=self.chat_discord, admin=False),
+		# )
 
 		# Register settings.
 		await self.context.setting.register(
@@ -148,7 +148,8 @@ class Ads(AppConfig):
 			else:
 				await self.instance.chat('$f00$iInvalid Discord Invite URL')
 
-			id_validity = await self.is_discord_url_valid("https://discordapp.com/api/guilds/" + id_setting + "/widget.json")
+			id_validity = await self.is_discord_url_valid(
+				"https://discordapp.com/api/guilds/" + id_setting + "/widget.json")
 			if id_validity:
 				self.discord_server_id = id_setting
 			else:

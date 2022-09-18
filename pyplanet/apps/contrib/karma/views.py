@@ -114,11 +114,15 @@ class KarmaListView(ManualListView):
 		self.app = app
 		self.manager = app.context.ui
 		self.map = map
+		self.cache = None
 
 	async def get_title(self):
 		return 'Karma votes on {}'.format(self.map.name)
 
 	async def get_data(self):
+		if self.cache:
+			return self.cache
+
 		karma = await Karma.execute(
 			Karma
 				.select(Karma, Player)
@@ -147,5 +151,6 @@ class KarmaListView(ManualListView):
 				vote = '$f00--'
 
 			votes.append({'nickname': item.player.nickname, 'vote': vote, 'power': round(power, 2), 'days': str(days) + " days"})
+		self.cache = votes
 
-		return votes
+		return self.cache
