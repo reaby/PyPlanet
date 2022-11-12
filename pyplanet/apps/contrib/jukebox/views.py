@@ -8,6 +8,7 @@ from pyplanet.apps.core.maniaplanet.models import Map
 from pyplanet.views import TemplateView
 from pyplanet.views.generics.alert import show_alert, ask_confirmation, ask_input
 from pyplanet.views.generics.list import ManualListView
+from pyplanet.utils.style import style_strip, STRIP_ALL
 
 from pyplanet.utils import times
 
