@@ -1,6 +1,33 @@
 Changelog
 =========
 
+0.10.4
+------
+
+Core
+~~~~
+
+* Bugfix: Mixing the removal of the bugfix of the slowdown in 0.10.2...
+
+
+0.10.3
+------
+
+Core
+~~~~
+
+* Bugfix: Fixing migration for jukebox app that might fail on PostgreSQL servers.
+
+
+0.10.2
+------
+
+Core
+~~~~
+
+* Bugfix: Fixing issue with slowdown on start when having a lot of maps.
+
+
 0.10.1
 ------
 
@@ -17,6 +44,9 @@ Apps
 ~~~~
 
 * Feature: Enable music server app to work on TM2020.
+
+* Improvement: Adding missing permissions to some admin commands (does not have any security impact)
+
 * Bugfix: Fix issue with linked CP's in TM2020 and the sector times app not counting correctly.
 * Bugfix: Internal issue with mapping record and karma information in memory.
 * Bugfix: Set the toolbar commands at a different initialization moment of the controller.

@@ -106,7 +106,7 @@ class PlayerAdmin:
 			)
 			await self.instance.gbx.multicall(
 				self.instance.gbx('ForceSpectator', dest_player[0].login, 3),
-				self.instance.chat(message)
+				self.instance.chat(message, player)
 			)
 		except Exception:
 			message = '$i$f00Unknown login!'
@@ -121,7 +121,7 @@ class PlayerAdmin:
 			await self.instance.gbx('ForceSpectator', dest_player[0].login, 2)
 			await self.instance.gbx.multicall(
 				self.instance.gbx('ForceSpectator', dest_player[0].login, 0),
-				self.instance.chat(message)
+				self.instance.chat(message, player)
 			)
 		except Exception as e:
 			if 'There are too many players' in str(e):
