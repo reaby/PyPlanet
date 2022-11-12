@@ -4,7 +4,7 @@ from pyplanet.apps.core.maniaplanet.models import Player, Map
 from pyplanet.apps.contrib.jukebox.views import FolderListView, FolderMapListView
 from pyplanet.contrib.setting import Setting
 
-from .models import MapFolder as Folders, MapInFolder
+from pyplanet.apps.contrib.jukebox.models import MapFolder as Folders, MapInFolder
 from ..local_records import LocalRecord
 
 
