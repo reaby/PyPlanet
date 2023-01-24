@@ -29,7 +29,7 @@ POOLS = [
 # Owners are logins of the server owners, the owners always get *ALL* the permissions in the system.
 OWNERS = {
 	'default': [
-		'your-maniaplanet-login'
+		str(os.environ.get("PYPLANET_OWNER", ""))
 	]
 }
 
@@ -41,11 +41,11 @@ SELF_UPGRADE = False
 DATABASES = {
 	'default': {
 		'ENGINE': 'peewee_async.MySQLDatabase',
-		'NAME': 'pyplanet',
+		'NAME': str(os.environ.get("DB_NAME", "pyplanet")),
 		'OPTIONS': {
-			'host': 'db',
-			'user': 'pyplanet',
-			'password': 'pyplanet',
+			'host': str(os.environ.get("DB_HOST", "deb")),
+			'user': str(os.environ.get("DB_USER", "pyplanet")),
+			'password': str(os.environ.get("DB_PASSWORD", "pyplanet")),
 			'charset': 'utf8mb4',
 		}
 	}
@@ -55,17 +55,17 @@ DATABASES = {
 # the instances.
 DEDICATED = {
 	'default': {
-		'HOST': 'dedicated',
-		'PORT': '5000',
-		'USER': 'SuperAdmin',
-		'PASSWORD': 'SuperAdmin',
+		'HOST': str(os.environ.get("RPC_IP", "127.0.0.1")),
+		'PORT': str(os.environ.get("RPC_PORT", "5000")),
+		'USER': str(os.environ.get("RPC_LOGIN", "SuperAdmin")),
+		'PASSWORD': str(os.environ.get("RPC_PASSWORD", "SuperAdmin")),
 	}
 }
 
 # Map configuration is a set of configuration options related to match settings etc.
 # Matchsettings filename.
 MAP_MATCHSETTINGS = {
-	'default': 'maplist.txt',
+	'default': str(os.environ.get("GAME_SETTINGS", "tracklist.txt")),
 }
 
 # Blacklist file is managed by the dedicated server and will be loaded and writen to by PyPlanet once a

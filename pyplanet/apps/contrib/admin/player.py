@@ -155,7 +155,7 @@ class PlayerAdmin:
 																					 team_name)
 		await self.instance.gbx.multicall(
 			self.instance.gbx('ForcePlayerTeam', dest_player[0].login, new_team),
-			self.instance.chat(message)
+			self.instance.chat(message, player)
 		)
 
 	async def switch_team(self, player, data, **kwargs):
@@ -325,7 +325,7 @@ class PlayerAdmin:
 		message = '$ff0Admin has un-blacklisted $fff{}$z$s$ff0.'.format(data.login)
 		await self.instance.gbx.multicall(
 			self.instance.gbx('UnBlackList', data.login),
-			self.instance.chat(message)
+			self.instance.chat(message, player)
 		)
 
 		# Try to save to file.
