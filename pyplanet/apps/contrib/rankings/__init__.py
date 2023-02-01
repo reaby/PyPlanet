@@ -91,8 +91,6 @@ SET @minimum_ranked_records = {};
 -- Total amount of maps active on the server.
 SET @active_map_count = {};
 -- Set the rank/current rank variables to ensure correct first calculation
-SET @player_rank = 0;
-SET @current_rank = 0;
 INSERT INTO rankings_rank (player_id, average, calculated_at)
 SELECT
 	player_id, average, calculated_at
@@ -111,11 +109,9 @@ FROM (
 			map_id,
 			player_id,
 			score,
-			@player_rank := IF(@current_rank = map_id, @player_rank + 1, 1) AS player_rank,
-			@current_rank := map_id
+			RANK() OVER (PARTITION BY map_id ORDER BY score ASC) AS player_rank
 		FROM localrecord
 		WHERE map_id IN ({})
-		ORDER BY map_id, score ASC
 	) AS ranked_records
 	WHERE player_rank <= @ranked_record_limit
 	GROUP BY player_id
