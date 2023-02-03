@@ -1,0 +1,90 @@
+{% extends 'core.views/uikit/v1/generics/bootstrap.xml' %}
+
+{% block main %}
+<frame pos="{{ widget_x }} {{ widget_y }}" size="{{size_x}} {{size_y}}" z-index="550" id="Window"
+       data-sizex="{{size_x}}" data-sizey="{{size_y}}" class="{% if distraction_hide %}distraction-hide{% endif %}">
+  {% block title %}
+      {% if title %}
+          {% if open_action %}
+          <label pos="17.5 -6" z-index="1" size="35 5" text="{{ title }}" textfont="RajdhaniMono" textsize="1.5"
+                 textemboss="1" halign="center" valign="bottom" action="{{ id }}__open_widget" scriptevents="1"
+          focusareacolor1="0000" focusareacolor2="0006" />
+          <label pos="29 -3.5" z-index="2" size="4 5" text="&#xf08e;" textsize="1.0" halign="center" valign="center2"
+                 action="{{ id }}__open_widget" scriptevents="1" focusareacolor1="0000" />
+                {% if toggable %}
+                <label pos="33 -3.5" z-index="2" size="4 5" text="" textsize="1.0" halign="center" valign="center2"
+                       data-layer="{{ layer }}" scriptevents="1" id="toggleLayer" focusareacolor1="0000"/>
+                {% endif %}
+          {% else %}
+          <label pos="17.5 -6" z-index="1" size="32 5" text="{{ title }}" textfont="RajdhaniMono" textsize="2.0"
+                 textemboss="1" halign="center" valign="bottom" focusareacolor1="0000" focusareacolor2="0006" />
+                {% if toggable %}
+                <label pos="33 -3.5" z-index="2" size="4 5" text="" textsize="1.0" halign="center" valign="center2"
+                      data-layer="{{ layer }}" id="toggleLayer" scriptevents="1" focusareacolor1="0000"/>
+                {% endif %}
+          {% endif %}
+          <quad pos="0 -6" size="35 0.30" bgcolor="FFFa" />
+          <quad pos="0 -5.5" size="15 0.5" bgcolor="FFFa" />
+      {% endif %}
+  {% endblock %}
+
+  <frame pos="0 {% if title %}-6.5{% else %}0{% endif %}">
+    {% block content %}{% endblock %}
+  </frame>
+
+</frame>
+{% endblock %}
+
+
+{% block maniascript %}
+<script><!--
+
+***OnInit***
+***
+  declare currentLayer = "{{ layer }}";
+  declare currentId = "{{ title }}";
+  declare oldVisibleLayer = "";
+  declare Text[Text] pyVisibleLayer for LocalUser = Text[Text];
+  if (! pyVisibleLayer.existskey(currentId)) {
+    pyVisibleLayer[currentId] = "normal";
+  }
+
+  // fix flickering on update...
+  if (currentLayer == pyVisibleLayer[currentId]) {
+      (Page.GetFirstChild("Window") as CMlFrame).Show();
+  } else {
+      (Page.GetFirstChild("Window") as CMlFrame).Hide();
+  }
+***
+
+***Loop***
+***
+
+  if (pyVisibleLayer.existskey(currentId) &&  (pyVisibleLayer[currentId] != oldVisibleLayer) ) {
+      oldVisibleLayer = pyVisibleLayer[currentId];
+        if (currentLayer == pyVisibleLayer[currentId]) {
+            (Page.GetFirstChild("Window") as CMlFrame).Show();
+        } else {
+            (Page.GetFirstChild("Window") as CMlFrame).Hide();
+        }
+    }
+
+    foreach(Event in PendingEvents) {
+        if (Event.Type == CMlScriptEvent::Type::MouseClick && Event.Control.ControlId == "toggleLayer") {
+            switch(Event.Control.DataAttributeGet("layer")) {
+                case "normal": {
+                   pyVisibleLayer[currentId] = "ScoresTable";
+                }
+                case "ScoresTable":{
+                   pyVisibleLayer[currentId] = "normal";
+                 }
+            }
+        }
+    }
+
+***
+--></script>
+  <script><!-- {% include 'core.views/uikit/v1/scripts/toggle_ui.Script.txt' %} --></script>
+  {{ super() }}
+
+  {% endblock %}

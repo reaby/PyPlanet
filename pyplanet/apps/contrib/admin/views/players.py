@@ -37,7 +37,7 @@ class PlayerListView(ManualListView):
 				'sorting': False,
 				'searching': True,
 				'width': 40,
-				'type': 'label',
+				'type': 'entry',
 			},
 			{
 				'name': 'Spec',
@@ -68,7 +68,8 @@ class PlayerListView(ManualListView):
 			login='{}'.format(p.login),
 			is_spectator='$f00&#xf03d;' if p.flow.is_spectator else '$73f&#xf007;',
 			is_spectator_bool=p.flow.is_spectator,
-			level='{}: {}'.format(p.level, p.get_level_string())
+			level='{}'.format(p.get_level_string()),
+			level_value=p.level,
 		) for p in players]
 
 	async def display(self, **kwargs):
@@ -91,6 +92,7 @@ class PlayerListView(ManualListView):
 				'text': 'Ignore',
 				'width': 12,
 				'action': self.action_ignore,
+				'require_confirm': True,
 				'safe': True,
 			},
 			{
@@ -107,6 +109,7 @@ class PlayerListView(ManualListView):
 				'text': 'Kick',
 				'width': 12,
 				'action': self.action_kick,
+				'require_confirm': True,
 				'safe': True,
 			},
 			{
@@ -115,6 +118,7 @@ class PlayerListView(ManualListView):
 				'text': 'Ban',
 				'width': 12,
 				'action': self.action_ban,
+				'require_confirm': True,
 				'safe': True,
 			},
 			{
@@ -123,6 +127,7 @@ class PlayerListView(ManualListView):
 				'text': 'Blacklist',
 				'width': 12,
 				'action': self.action_blacklist,
+				'require_confirm': True,
 				'safe': True,
 			},
 		]
@@ -156,9 +161,17 @@ class PlayerListView(ManualListView):
 		await self.refresh(self.player)
 
 	async def action_ban(self, user, values, player, *args, **kwargs):
-		await self.app.instance.command_manager.execute(user, '//ban', player['login'])
-		await self.refresh(self.player)
+		if player['level_value'] != 3:
+			await self.app.instance.command_manager.execute(user, '//ban', player['login'])
+			await self.refresh(self.player)
+		else:
+			await self.app.instance.chat(
+				"$z$saction denied. {}$z$s is {}.".format(player['nickname'], player['level'], user.login))
 
 	async def action_blacklist(self, user, values, player, *args, **kwargs):
-		await self.app.instance.command_manager.execute(user, '//blacklist', player['login'])
-		await self.refresh(self.player)
+		if player['level_value'] != 3:
+			await self.app.instance.command_manager.execute(user, '//blacklist', player['login'])
+			await self.refresh(self.player)
+		else:
+			await self.app.instance.chat(
+				"$z$saction denied. {}$z$s is {}.".format(player['nickname'], player['level'], user.login))

@@ -25,6 +25,7 @@ class ControllerView(TemplateView):
 		return await super().display(**kwargs)
 
 	async def action_f8(self, player, *args, **kwargs):
-		await self.manager.instance.chat(
-			'$ff0Toggling visibility. You can show/hide with F8, and show/hide when driving with F9', player
-		)
+		#await self.manager.instance.chat(
+		#	'$ff0Toggling visibility.', player
+		#)
+		pass

@@ -11,7 +11,7 @@ main() {
 
   while(True) {
     yield;
-    if (GUIPlayer == Null || GUIPlayer.RaceState == CTmMlPlayer::ERaceState:: Finished) continue;
+    if (GUIPlayer == Null || GUIPlayer.RaceState == CTmMlPlayer::ERaceState::Finished) continue;
 
     if (GUIPlayer.RaceState != oldState) {
       oldState = GUIPlayer.RaceState;

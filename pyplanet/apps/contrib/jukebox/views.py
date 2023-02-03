@@ -1,5 +1,6 @@
 import asyncio
 import math
+import re
 
 from playhouse.shortcuts import model_to_dict
 
@@ -105,6 +106,7 @@ class MapListView(ManualListView):
 			map_dict['local_record_diff'] = None
 			map_dict['local_record_diff_direction'] = None
 			map_dict['karma'] = None
+			map_dict['disabled'] = 0
 
 			# Use custom field for author to allow for searching on both login and nickname (depending on what's shown).
 			map_dict['author'] = (
@@ -121,7 +123,8 @@ class MapListView(ManualListView):
 			if local_app_installed:
 				# Get personal local record of the user.
 				map_locals = await self.app.instance.apps.apps['local_records'].get_map_record(m)
-				rank, record = await self.app.instance.apps.apps['local_records'].get_player_record_and_rank_for_map(m, self.player)
+				rank, record = await self.app.instance.apps.apps['local_records'].get_player_record_and_rank_for_map(m,
+																													 self.player)
 
 				if isinstance(rank, int) and rank >= 1:
 					map_dict['local_record_rank'] = int(rank)
@@ -148,7 +151,7 @@ class MapListView(ManualListView):
 				'sorting': True,
 				'searching': True,
 				'search_strip_styles': True,
-				'width': 90,
+				'width': 80,
 				'type': 'label',
 				'action': self.action_jukebox
 			},
@@ -162,6 +165,14 @@ class MapListView(ManualListView):
 				'width': 45,
 			},
 		]
+
+		if self.player.level > 1:
+			fields.insert(0, {
+				'name': '#',
+				'type': 'checkbox',
+				'width': 6,
+				'index': 'disabled'
+			})
 
 		def render_optional_time(row, field):
 			value = row[field['index']]
@@ -186,9 +197,9 @@ class MapListView(ManualListView):
 			if isinstance(value, (int, float)) and not math.isnan(value):
 				prefix = ''
 				if value > 0.0:
-					prefix = '$6CF'
+					prefix = '$6CF '
 				elif value < 0.0:
-					prefix = '$F66'
+					prefix = '$F66 '
 				return '{}{}'.format(prefix, float(value))
 
 		if self.advanced and not self.app.instance.performance_mode:
@@ -240,22 +251,29 @@ class MapListView(ManualListView):
 		buttons = [
 			{
 				'title': 'Folders',
-				'width': 20,
+				'width': 24,
 				'action': self.action_folders
 			}
 		]
+		if self.player.level > 1:
+			buttons.append({
+				'title': ' Selected',
+				'width': 24,
+				'action': self.action_remove_selected,
+				'require_confirm': True
+			})
 
 		if self.supports_advanced:
 			if self.advanced:
 				buttons.append({
 					'title': 'Simple list',
-					'width': 30,
+					'width': 24,
 					'action': self.action_advanced
 				})
 			else:
 				buttons.append({
 					'title': 'Advanced list',
-					'width': 30,
+					'width': 24,
 					'action': self.action_advanced
 				})
 
@@ -263,6 +281,18 @@ class MapListView(ManualListView):
 
 	async def action_jukebox(self, player, values, map_info, **kwargs):
 		await self.app.add_to_jukebox(player, await self.app.instance.map_manager.get_map(map_info['uid']))
+
+	async def action_remove_selected(self, player, values, **kwargs):
+		for key, value in values.items():
+			if key.startswith('checkbox_') and value == '1':
+				match = re.search('^checkbox_([0-9]+)_([0-9]+)$', key)
+				if len(match.groups()) != 2:
+					return
+
+				row = int(match.group(1))
+				await self.app.instance.command_manager.execute(player, '//remove {}'.format(self.objects[row]['id']))
+		self.cache = list()
+		await self.display(player=self.player)
 
 	async def action_folders(self, player, values, **kwargs):
 		await self.app.folder_manager.display_folder_list(player)
@@ -285,12 +315,12 @@ class MapListView(ManualListView):
 		await self.refresh(player=self.player)
 
 	@classmethod
-	def add_action(cls, target, name, text, text_size='1.2', require_confirm=False, order=0):
+	def add_action(cls, target, name, text, class_name='', require_confirm=False, order=0):
 		cls.custom_actions.append(dict(
 			name=name,
 			action=target,
 			text=text,
-			textsize=text_size,
+			class_name=class_name,
 			safe=True,
 			type='label',
 			order=order,
@@ -354,7 +384,9 @@ class FolderMapListView(MapListView):
 
 		items = []
 		for item in self.map_list:
-			items.append(await self.map_to_dict(item))
+			dict_item = model_to_dict(item)
+			dict_item['disabled'] = 0
+			items.append(dict_item)
 
 		self.cache = items
 		return self.cache
@@ -367,9 +399,10 @@ class FolderMapListView(MapListView):
 			return
 
 		# Ask for confirmation.
-		cancel = bool(await ask_confirmation(player, 'Are you sure you want to remove the map \'{}\'$z$s from the folder?'.format(
-			map_dictionary['name']
-		), size='sm'))
+		cancel = bool(
+			await ask_confirmation(player, 'Are you sure you want to remove the map \'{}\'$z$s from the folder?'.format(
+				map_dictionary['name']
+			), size='sm'))
 		if cancel is True:
 			return
 
@@ -382,7 +415,8 @@ class FolderMapListView(MapListView):
 				self.cache.remove(item)
 
 		# Refresh list.
-		await self.refresh(player)
+		self.cache = list()
+		await self.display(player)
 
 	async def get_buttons(self):
 		buttons = await super().get_buttons()
@@ -393,7 +427,7 @@ class FolderMapListView(MapListView):
 			or (self.folder_code['type'] == 'private' and self.folder_code['owner_login'] == self.player.login):
 			buttons.append({
 				'title': 'Add current map',
-				'width': 38,
+				'width': 32,
 				'action': self.action_add_current
 			})
 

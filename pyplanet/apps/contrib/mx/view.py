@@ -3,7 +3,7 @@ MX List Views.
 """
 import asyncio
 import logging
-
+import re
 from pyplanet.views.generics import ManualListView, ask_confirmation
 from pyplanet.views.generics.widget import WidgetView
 from pyplanet.apps.contrib.mx.exceptions import MXMapNotFound, MXInvalidResponse
@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 class MxSearchListView(ManualListView):
+	title = '🔍 Search Mania-Exchange'
+
 	def __init__(self, app, player, api):
 		"""
 		:param app: App config instance.
@@ -34,9 +36,19 @@ class MxSearchListView(ManualListView):
 
 		self.search_map = None
 		self.search_author = None
+		self.style = "-1"
+		self.mode = "0"
+
 		self.provide_search = True
 
 		self.fields = [
+			{
+				'name': "#",
+				'type': "checkbox",
+				'width': 6,
+				'sorting': False,
+				'index': 'disabled'
+			},
 			{
 				'name': 'ID',
 				'index': 'mxid',
@@ -79,8 +91,8 @@ class MxSearchListView(ManualListView):
 				'type': 'label'
 			},
 			{
-				'name': 'Difficulty',
-				'index': 'difficulty',
+				'name': 'Style',
+				'index': 'style',
 				'sorting': True,
 				'searching': False,
 				'width': 25,
@@ -105,6 +117,17 @@ class MxSearchListView(ManualListView):
 	async def get_title(self):
 		return '🔍 Search {}'.format(self.app.site_name)
 
+	async def get_buttons(self):
+		buttons = [
+			{
+				'title': ' Selected',
+				'width': 20,
+				'action': self.action_install_selected,
+				'require_confirm': True
+			}
+		]
+		return buttons
+
 	async def get_data(self):
 		if not self.has_data:
 			# First opening, request the data.
@@ -117,6 +140,112 @@ class MxSearchListView(ManualListView):
 		data = await super().get_object_data()
 		data['search_map'] = self.search_map
 		data['search_author'] = self.search_author
+		data['mode'] = [
+			{
+				"text": "Default",
+				"value": "0"
+			},
+			{
+				"text": "Latest Tracks",
+				"value": "2"
+			},
+			{
+				"text": "Recently Awarded",
+				"value": "3"
+			},
+			{
+				"text": "Best Maps of the Month",
+				"value": "5"
+			},
+			{
+				"text": "Best Karma of Month",
+				"value": "22"
+			}
+		]
+		if self.app.instance.game.game == "tm" or self.app.instance.game.game == "tmnext":
+			data['styles'] = [
+				{
+					"text": "Select...",
+					"value": "-1"
+				},
+				{
+					"text": "Race",
+					"value": "1"
+				},
+				{
+					"text": "Fullspeed",
+					"value": "2"
+				},
+				{
+					"text": "Tech",
+					"value": "3"
+				},
+				{
+					"text": "RPG",
+					"value": "4"
+				},
+				{
+					"text": "LOL",
+					"value": "5"
+				},
+				{
+					"text": "Press Forward",
+					"value": "6"
+				},
+				{
+					"text": "Speedtech",
+					"value": "7"
+				},
+				{
+					"text": "Multilap",
+					"value": "8"
+				},
+				{
+					"text": "Offroad",
+					"value": "9"
+				},
+				{
+					"text": "Trial",
+					"value": "10"
+				},
+			]
+		else:
+			data['styles'] = [
+				{
+					"text": "Select...",
+					"value": "-1"
+				},
+				{
+					"text": "Solo",
+					"value": "1"
+				},
+				{
+					"text": "Team",
+					"value": "2"
+				},
+				{
+					"text": "Versus",
+					"value": "3"
+				},
+				{
+					"text": "Other",
+					"value": "4"
+				},
+			]
+
+		data['style_index'] = 0
+		i = 0
+		for i, val in enumerate(data['styles']):  # for name, age in dictionary.iteritems():  (for Python 2.x)
+			if self.style == val['value']:
+				data['style_index'] = i
+			i += 1
+
+		data['mode_index'] = 0
+		for i, val in enumerate(data['mode']):  # for name, age in dictionary.iteritems():  (for Python 2.x)
+			if self.mode == val['value']:
+				data['mode_index'] = i
+			i += 1
+
 		return data
 
 	async def display(self, player=None):
@@ -130,9 +259,21 @@ class MxSearchListView(ManualListView):
 				'text': 'Install',
 				'width': 12,
 				'action': self.action_install,
+				'require_confirm': True,
 				'safe': True
 			}
 		]
+
+	async def action_install_selected(self, player, values, **kwargs):
+		for key, value in values.items():
+			if key.startswith('checkbox_') and value == '1':
+				match = re.search('^checkbox_([0-9]+)_([0-9]+)$', key)
+				if len(match.groups()) != 2:
+					return
+
+				row = int(match.group(1))
+				print(self.app.namespace)
+				await self.app.instance.command_manager.execute(player, '//tmx add {}'.format(self.objects[row]['mxid']))
 
 	async def action_install(self, user, values, map, *args, **kwargs):
 		await self.app.instance.command_manager.execute(
@@ -144,6 +285,8 @@ class MxSearchListView(ManualListView):
 	async def action_search(self, user, action, values, *args, **kwargs):
 		self.search_map = values['map']
 		self.search_author = values['author']
+		self.mode = values['mode']
+		self.style = values['style']
 
 		if values['map'] == "Search Map...":
 			self.search_map = None
@@ -156,11 +299,13 @@ class MxSearchListView(ManualListView):
 		try:
 			options = {
 				"api": "on",
-				"mode": 0,
+				"mode": self.mode,
 				"gv": 1,
 				"limit": 100,
 				"tpack": self.app.instance.game.dedicated_title.split("@", 1)[0]
 			}
+			if self.style is not "-1":
+				options['style'] = self.style
 
 			if trackname is not None:
 				options['trackname'] = trackname
@@ -193,7 +338,8 @@ class MxSearchListView(ManualListView):
 				length=_map['LengthName'],
 				difficulty=_map['DifficultyName'],
 				maptype=_map['MapType'],
-				style=_map['StyleName']
+				style=_map['StyleName'],
+				disabled=0
 			) for _map in infos]
 		else:
 			self.cache = [dict(
@@ -205,7 +351,8 @@ class MxSearchListView(ManualListView):
 				awards='$fff🏆 {}'.format(_map['AwardCount']) if _map['AwardCount'] > 0 else "",
 				difficulty=_map['DifficultyName'],
 				maptype=_map['MapType'],
-				style=_map['StyleName']
+				style=_map['StyleName'],
+				disabled=0
 			) for _map in infos]
 
 		if refresh:
@@ -275,7 +422,7 @@ class MxPacksListView(ManualListView):
 				'sorting': True,
 				'searching': False,
 				'width': 15,
-				'type': 'label'
+				'type': 'label',
 			}
 		]
 
@@ -363,16 +510,16 @@ class MxPacksListView(ManualListView):
 			return None
 
 		self.cache = [dict(
-				mxid=_map['ID'],
-				name=_map['Name'],
-				author=_map['Username'],
-				mapcount=_map['TrackCount'],
-				typename=_map['TypeName'],
-				style=_map['StyleName'],
-				videourl="$l[{video}]Video$l".format(video=_map['VideoURL']) if len(_map['VideoURL']) > 0 else "",
-				unreleased='{}'.format(_map['Unreleased']),
-				request='{}'.format(_map['Request'])
-			) for _map in infos]
+			mxid=_map['ID'],
+			name=_map['Name'],
+			author=_map['Username'],
+			mapcount=_map['TrackCount'],
+			typename=_map['TypeName'],
+			style=_map['StyleName'],
+			videourl="$l[{video}]Video$l".format(video=_map['VideoURL']) if len(_map['VideoURL']) > 0 else "",
+			unreleased='{}'.format(_map['Unreleased']),
+			request='{}'.format(_map['Request'])
+		) for _map in infos]
 
 		if refresh:
 			await self.refresh(self.player)

@@ -1,0 +1,53 @@
+{% extends 'core.views/uikit/v1/window.xml' %}
+
+  {% block header %}
+    <!-- <label pos="210 -3.5" size="72 7" text="$o{{ count }} items" textsize="1" textfont="RajdhaniMono" halign="right" valign="center" /> -->
+    {{ super() }}
+  {% endblock %}
+
+{% block contents %}
+
+  <frame pos="10 0" size="218 6" id="list_header">
+          <quad pos="0 0.2" size="220 5.2" z-index="-20" style="Bgs1InRace" substyle="BgCardList"/>
+          {% for field in fields %}
+          <label pos="{{ field.left }} -2.4" size="{{ field.width }} 4.9" text="$o$fff {{ field.name }}"
+                 textsize="1.3" valign="center2" />
+          {% endfor %}
+  </frame>
+
+  {% call ui.scrollable(10, -6, 218, 100, 0, (count*4) ) %}
+
+    {% for name, setting_value in settings.items() %}
+    <frame pos="2 -{{ (loop.index0 * 6) + 2}}">
+      <label pos="0 -2.5" size="80 5" text="{{name}}" textsize="1.2" valign="center" />
+
+      {% if types[name] == "bool" %}
+        {% if setting_value == True %}
+          {{ ui.checkbox("", name, 80, 0, 1) }}
+        {% elif setting_value == False %}
+          {{ ui.checkbox("", name, 80, 0, 0) }}
+        {% endif %}
+
+      {% elif types[name] == "string" %}
+          {{ ui.input(setting_value, name, 80, -2.5, 80) }}
+      {% elif types[name] == "password" %}
+           {{ ui.input_masked(setting_value, name, 80, -2.5, 80) }}
+      {% elif types[name] == "int" or types[name] == "float" %}
+          {{ ui.input(setting_value|default("0",True), name, 80, -2.5, 80) }}
+      {% else %}
+         <label pos="80 -2.5" size="80 5" text="*listed value not supported*" textsize="1" halign="center" valign="center" />
+      {% endif %}
+
+      <label pos="180 -2.5" size="60 5" text="{{types[name]}}" textsize="1.2" halign="center" valign="left" />
+
+      {% if loop.index0 % 2 != 0 %}
+          <quad pos="0 0" size="220 5" z-index="-20" bgcolor="0003"/>
+      {% endif %}
+    </frame>
+    {% endfor %}
+  {% endcall %}
+
+  {{ ui.button_confirm("Save", id+"__button_save", 180, -110, 24, 6) }}
+  {{ ui.button_outline("Cancel", id+"__button_cancel", 206, -110, 24, 6) }}
+
+{% endblock %}

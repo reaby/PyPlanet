@@ -243,7 +243,7 @@ class CallActionView(TemplateView):
 		if len(self.method['inputs']) > 0:
 			for idx, input in enumerate(self.method['inputs']):
 				if len(input_values) <= idx:
-					await self.parent.app.instance.chat('$ff0Warning: Not enough inputs given for the call!', player)
+					# await self.parent.app.instance.chat('$ff0Warning: Not enough inputs given for the call!', player)
 					continue
 
 				args.append(self.convert_type(input_values[idx], input))
@@ -265,5 +265,5 @@ class CallActionView(TemplateView):
 		except Exception as e:
 			logging.getLogger(__name__).warning('Executing GBX in-game, error thrown: {}'.format(str(e)))
 			await self.hide([player.login])
-			self.response_future.set_result(False)
+			self.response_future.set_result(None)
 			self.response_future.done()

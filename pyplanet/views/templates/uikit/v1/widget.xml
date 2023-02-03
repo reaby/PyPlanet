@@ -1,0 +1,31 @@
+{% extends 'core.views/uikit/v1/generics/bootstrap.xml' %}
+
+{% block main %}
+<frame pos="{{ widget_x }} {{ widget_y }}" z-index="{{ z_index }}" data-sizex="{{size_x}}" data-sizey="{{size_y}}" id="Window" class="{% if distraction_hide %}distraction-hide{% endif %}">
+  {% block title %}
+      {% if title %}
+          {% if open_action %}
+          <label pos="17.5 -3" z-index="1" size="35 6" text="$t$i{{ title }}" textsize="1.2"
+                 textemboss="0" halign="center" valign="center2" textfont="GameFontSemiBold"
+                 action="{{ id }}__open_widget" scriptevents="1" focusareacolor1="000b" focusareacolor2="000a" />
+          {% else %}
+          <label pos="17.5 -3" z-index="1" size="35 6" text="$t$i{{ title }}" textsize="1.2" textfont="GameFontSemiBold"
+                 textemboss="0" scriptevents="1" halign="center" valign="center2" focusareacolor1="000a" focusareacolor2="000a"/>
+          {% endif %}
+          <quad pos="0 -6" size="35 0.25" bgcolor="FFF" />
+
+      {% endif %}
+  {% endblock %}
+
+  <frame pos="0 {% if title %}-6.5{% else %}0{% endif %}">
+    {% block content %}{% endblock %}
+  </frame>
+
+</frame>
+{% endblock %}
+
+{% block maniascript %}
+  <script><!-- {% include 'core.views/uikit/v1/scripts/toggle_ui.Script.txt' %} --></script>
+  {{ super() }}
+
+{% endblock %}

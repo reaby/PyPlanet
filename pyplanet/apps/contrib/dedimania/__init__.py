@@ -33,6 +33,7 @@ class Dedimania(AppConfig):
 		super().__init__(*args, **kwargs)
 
 		self.widget = None
+		self.widget2 = None
 		self.api = None
 
 		self.lock = asyncio.Lock()
@@ -116,6 +117,11 @@ class Dedimania(AppConfig):
 				'dedicps', target=self.command_dedicps, description='Compare your dedimania record checkpoints with another record.'
 			).add_param('record', required=False, type=int, help='Custom record rank to compare with. Defaults to 1.', default=1)
 		)
+
+		# Change round results widget location.
+
+		# Load initial data.
+		self.widget = DedimaniaRecordsWidget(self)
 
 	async def reload_settings(self, *args, **kwargs):
 		# Check setting + return errors if not correct!
@@ -222,6 +228,7 @@ class Dedimania(AppConfig):
 		if not self.map_status:
 			message = '$f90This map is not supported by Dedimania (min 1 checkpoint + 6.2 seconds or higher author time).'
 			await self.widget.hide()
+			await self.widget2.hide()
 			return await self.instance.chat(message)
 
 		# Refresh script.
@@ -235,13 +242,15 @@ class Dedimania(AppConfig):
 			self.current_records = list()
 		if self.ready:
 			await self.widget.display()
+			await self.widget2.display()
 
 		await self.refresh_records()
 
 		if self.ready:
 			await asyncio.gather(
 				self.chat_current_record(),
-				self.widget.display()
+				self.widget.display(),
+				self.widget2.display()
 			)
 
 		# Cleanup ghosts from previous maps.
@@ -405,6 +414,7 @@ class Dedimania(AppConfig):
 				return
 			if self.ready:
 				await self.widget.display(player=player)
+				await self.widget2.display(player=player)
 			res = await self.instance.gbx('GetDetailedPlayerInfo', player.login)
 			p_info = await self.api.player_connect(
 				player.login, player.nickname, res['Path'], is_spectator
@@ -490,7 +500,7 @@ class Dedimania(AppConfig):
 						times.format_time((previous_time - score))
 					)
 
-				coros = [self.widget.display()]
+				coros = [self.widget.display(), self.widget2.display()]
 
 				if chat_announce >= new_rank:
 					coros.append(self.instance.chat(message))
@@ -546,6 +556,7 @@ class Dedimania(AppConfig):
 			await asyncio.gather(
 				chat_await,
 				self.widget.display(),
+				self.widget2.display(),
 			)
 
 	async def get_v_replay(self, login):

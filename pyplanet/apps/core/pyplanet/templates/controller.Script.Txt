@@ -1,4 +1,3 @@
-
 declare netwrite Boolean Net_DistractionFreeMode for UI;
 declare netwrite Boolean Net_DriveHideMode for UI;
 

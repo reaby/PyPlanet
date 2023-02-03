@@ -97,6 +97,7 @@ class _BaseUIManager:
 				else:
 					raise Exception('Manialink has no body or template defined!')
 
+
 				# Add manialink tag to body.
 				body = '<manialink version="{}" id="{}" layer="{}" name="{}" attach="{}">{}</manialink>'.format(manialink.version, manialink.id, layer, name, attachid, body)
 

@@ -1,8 +1,6 @@
-<quad pos="150 -50" z-index="100" size="10 10" image="http://maniacdn.net/toffe/pyplanet/apps/ads/discord_logo.png"
-      autoscale="0" opacity ="0.6" halign="center" valign="center" url="{{ discord_url}}" class="distraction-hide" />
+{% extends 'core.views/uikit/v1/widget.xml' %}
 
-{% if _game.game == 'tmnext' %}
-    <script><!-- {% include 'core.views/generics/widget_next.Script.Txt' %} --></script>
-{% else %}
-    <script><!-- {% include 'core.views/generics/widget.Script.Txt' %} --></script>
-{% endif %}
+{% block content %}
+<quad pos="0 0" z-index="100" size="12 12" image="http://maniacdn.net/toffe/pyplanet/apps/ads/discord_logo.png"
+      autoscale="0" opacity ="0.6" halign="center" valign="center" url="{{ discord_url}}" class="distraction-hide" />
+{% endblock %}

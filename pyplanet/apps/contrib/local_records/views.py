@@ -11,6 +11,8 @@ from pyplanet.utils import times
 class LocalRecordsWidget(TimesWidgetView):
 	widget_x = 125
 	widget_y = 56.5
+	size_x = 38
+	size_y = 55.5
 	z_index = 130
 	top_entries = 5
 	title = 'Local Records'
@@ -84,11 +86,11 @@ class LocalRecordsWidget(TimesWidgetView):
 				record_player = record.player
 				list_record = dict()
 				list_record['index'] = index
-				list_record['color'] = '$fff'
+				list_record['color'] = 'fff'
 				if index <= self.top_entries:
-					list_record['color'] = '$ff0'
+					list_record['color'] = 'ff0'
 				if index == player_index:
-					list_record['color'] = '$0f3'
+					list_record['color'] = '0f3'
 				list_record['nickname'] = record_player.nickname
 				list_record['score'] = times.format_time(int(record.score))
 				if index == self.top_entries:
@@ -126,9 +128,9 @@ class LocalRecordsWidget(TimesWidgetView):
 				record_player = record.player
 				list_record = dict()
 				list_record['index'] = index
-				list_record['color'] = '$fff'
+				list_record['color'] = 'fff'
 				if index <= self.top_entries:
-					list_record['color'] = '$ff0'
+					list_record['color'] = 'ff0'
 				list_record['nickname'] = record_player.nickname
 				list_record['score'] = times.format_time(int(record.score))
 				index += 1

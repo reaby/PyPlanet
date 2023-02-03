@@ -2,8 +2,7 @@ import asyncio
 
 from pyplanet.apps.config import AppConfig
 from pyplanet.apps.core.maniaplanet import callbacks as mp_signals
-
-from . import views
+from pyplanet.apps.contrib.info import views
 
 
 class Info(AppConfig):

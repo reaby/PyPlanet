@@ -1,24 +1,32 @@
-// #RequireContext CSmMlScriptIngame
+
 #Const up ""
 #Const down ""
 
 main() {
-  declare oldGear = -1;
+  declare oldGear = 1;
+  declare CSmPlayer::ESpawnStatus oldState = CSmPlayer::ESpawnStatus::NotSpawned;
 
   declare label_indicator <=> (Page.GetFirstChild("indicator") as CMlLabel);
   declare label_gear <=> (Page.GetFirstChild("gear") as CMlLabel);
 
   while(True) {
     yield;
+    if (GUIPlayer == Null) continue;
 
-    if (InputPlayer == Null) continue;
-    log(InputPlayer.EngineCurGear);
+    if (GUIPlayer.SpawnStatus != oldState) {
+      oldState = GUIPlayer.SpawnStatus;
+      if (GUIPlayer.SpawnStatus == CSmPlayer::ESpawnStatus::Spawning) {
+        oldGear = 1;
+      }
+    }
+
     // render
-    if (InputPlayer.EngineCurGear != oldGear)
+    if (GUIPlayer.EngineCurGear != oldGear)
     {
+
       label_gear.Opacity = 0.7;
       label_indicator.Opacity = 0.7;
-      if (InputPlayer.EngineCurGear > oldGear) {
+      if (GUIPlayer.EngineCurGear > oldGear) {
         label_indicator.Value = up;
         label_indicator.RelativePosition_V3 = <6.0, -4.5>;
         AnimMgr.Add(label_indicator, """<label opacity="0" pos="6 9"/>""", 500, CAnimManager::EAnimManagerEasing::SineInOut);
@@ -28,14 +36,16 @@ main() {
         AnimMgr.Add(label_indicator, """<label opacity="0" pos="6 -9"/>""", 500, CAnimManager::EAnimManagerEasing::SineInOut);
       }
 
-      if (InputPlayer.EngineCurGear == 0) {
+      if (GUIPlayer.EngineCurGear == 0) {
         label_gear.Value = "R";
       } else {
-        label_gear.Value = "" ^ InputPlayer.EngineCurGear;
+        label_gear.Value = "" ^ GUIPlayer.EngineCurGear;
       }
 
-      AnimMgr.Add(label_gear, """<label opacity="0"/>""", 500, CAnimManager::EAnimManagerEasing::SineInOut);
-      oldGear = InputPlayer.EngineCurGear;
+    //  AnimMgr.Add(label_gear, """<label opacity="0"/>""", 500, CAnimManager::EAnimManagerEasing::SineInOut);
+      oldGear = GUIPlayer.EngineCurGear;
     }
+
+
   }
 }

@@ -1,46 +1,36 @@
+***OnInit***
+***
+declare Cb_Public  <=> (Page.GetFirstChild("cb_public") as CMlFrame);
+declare Cb_Private <=> (Page.GetFirstChild("cb_private") as CMlFrame);
+declare Cb_Admin_Only <=> (Page.GetFirstChild("cb_admin_only") as CMlFrame);
 
-declare Entry_FolderName_Value <=> (Page.GetFirstChild("folder_name") as CMlEntry);
 declare Entry_FolderPrivacy_Value <=> (Page.GetFirstChild("folder_privacy") as CMlEntry);
-declare Entry_AdminStatus_Value <=> (Page.GetFirstChild("folder_is_admin") as CMlEntry);
+Entry_FolderPrivacy_Value.Value = "public";
 
-declare Quad_FolderPrivacy_Public_Boolean <=> (Page.GetFirstChild("folder_privacy_public") as CMlQuad);
-declare Quad_FolderPrivacy_Private_Boolean <=> (Page.GetFirstChild("folder_privacy_private") as CMlQuad);
-declare Quad_FolderPrivacy_AdminsOnly_Boolean <=> (Page.GetFirstChild("folder_privacy_admins_only") as CMlQuad);
+***
 
-while(True) {
-  foreach (Event in PendingEvents) {
-    if (Event.Type == CMlScriptEvent::Type::MouseClick && Event.ControlId == "folder_privacy_public") {
-      // Check Admin status
-      if (Entry_AdminStatus_Value.Value == "1") {
-        // Uncheck other one.
-        Quad_FolderPrivacy_Private_Boolean.StyleSelected = False;
-        Quad_FolderPrivacy_AdminsOnly_Boolean.StyleSelected = False;
-        Quad_FolderPrivacy_Public_Boolean.StyleSelected = True;
-
-        Entry_FolderPrivacy_Value.Value = "public";
-      }
+***OnMouseClick***
+***
+if (Event.Control.HasClass("uiCheckboxElement") ) {
+    if (Event.Control.Parent.HasClass("uiCheckbox")) {
+        if (Event.Control.Parent.ControlId == "cb_public") {
+            Entry_FolderPrivacy_Value.Value = "public";
+            uiSetCheckbox(Cb_Private, False);
+            uiSetCheckbox(Cb_Admin_Only, False);
+            uiSetCheckbox(Cb_Public, True);
+        }
+        if (Event.Control.Parent.ControlId == "cb_private"){
+            Entry_FolderPrivacy_Value.Value = "private";
+            uiSetCheckbox(Cb_Private, True);
+            uiSetCheckbox(Cb_Admin_Only, False);
+            uiSetCheckbox(Cb_Public, False);
+        }
+        if (Event.Control.Parent.ControlId == "cb_private") {
+        Entry_FolderPrivacy_Value.Value = "admin_only";
+        uiSetCheckbox(Cb_Private, False);
+        uiSetCheckbox(Cb_Admin_Only, True);
+        uiSetCheckbox(Cb_Public, False);
+        }
     }
-
-    if (Event.Type == CMlScriptEvent::Type::MouseClick && Event.ControlId == "folder_privacy_admins_only") {
-      // Check Admin status
-      if (Entry_AdminStatus_Value.Value == "1") {
-        // Uncheck other one.
-        Quad_FolderPrivacy_Private_Boolean.StyleSelected = False;
-        Quad_FolderPrivacy_AdminsOnly_Boolean.StyleSelected = True;
-        Quad_FolderPrivacy_Public_Boolean.StyleSelected = False;
-
-        Entry_FolderPrivacy_Value.Value = "admins_only";
-      }
-    }
-
-    if (Event.Type == CMlScriptEvent::Type::MouseClick && Event.ControlId == "folder_privacy_private") {
-      // Uncheck other one.
-      Quad_FolderPrivacy_Private_Boolean.StyleSelected = True;
-      Quad_FolderPrivacy_AdminsOnly_Boolean.StyleSelected = False;
-      Quad_FolderPrivacy_Public_Boolean.StyleSelected = False;
-
-      Entry_FolderPrivacy_Value.Value = "private";
-    }
-  }
-  yield;
 }
+***

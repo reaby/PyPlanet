@@ -11,14 +11,14 @@ logger = logging.getLogger(__name__)
 class WidgetView(TemplateView):
 	widget_x = None
 	widget_y = None
-	size_x = None
-	size_y = None
+	size_x = 50
+	size_y = 50
 	title = None
 	action = None
 	z_index = None
 	distraction_hide = True
-
-	template_name = 'core.views/generics/widget.xml'
+	layer = "normal"
+	template_name = 'core.views/uikit/v1/widget.xml'
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -101,7 +101,7 @@ class WidgetView(TemplateView):
 
 
 class TimesWidgetView(WidgetView):
-	template_name = 'core.views/generics/timeswidget.xml'
+	template_name = 'core.views/uikit/v1/timeswidget.xml'
 
 	async def get_context_data(self):
 		context = await super().get_context_data()

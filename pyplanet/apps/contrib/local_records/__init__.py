@@ -324,6 +324,9 @@ class LocalRecords(AppConfig):
 				'own_records': current_records,
 				'own_record': current_record
 			})
+		top_gain = self.instance.apps.apps["topgains"]
+		if top_gain is not None:
+			await top_gain.update_record(player, previous_index, new_index)
 
 		if self.widget is None:
 			self.widget = LocalRecordsWidget(self)

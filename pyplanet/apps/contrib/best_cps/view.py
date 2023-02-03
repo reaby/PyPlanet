@@ -4,11 +4,11 @@ from pyplanet.views.generics.widget import TimesWidgetView
 
 
 class BestCpTimesWidget(TimesWidgetView):
-	widget_x = -124.75
+	widget_x = -124
 	widget_y = 90
 	z_index = 130
-	size_x = 250
-	size_y = 18
+	size_x = 240
+	size_y = 20
 	title = 'Best CPs'
 
 	template_name = 'best_cps/widget_top.xml'
@@ -18,6 +18,7 @@ class BestCpTimesWidget(TimesWidgetView):
 		self.app = app
 		self.manager = app.context.ui
 		self.id = 'pyplanet__widget_bestcps'
+		self.logins = []
 		self.action = self.action_cptimeslist
 
 	async def get_player_data(self):
@@ -28,7 +29,7 @@ class BestCpTimesWidget(TimesWidgetView):
 			for pcp in self.app.best_cp_times:
 				list_time = {
 					'index': pcp.cp,
-					'color': "$0f3" if player.login == pcp.player.login else "$ff0",
+					'color': "0f3" if player.login == pcp.player.login else "ff0",
 					'cptime': times.format_time(pcp.time),
 					'nickname': pcp.player.nickname,
 					'login': pcp.player.login

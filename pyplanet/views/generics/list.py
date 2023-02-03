@@ -64,7 +64,7 @@ class ListView(TemplateView):
 	actions = []
 	buttons = []
 
-	template_name = 'core.views/generics/list.xml'
+	template_name = 'core.views/uikit/v1/list.xml'
 
 	single_list = True
 	"""Change this to False to have multiple lists open at the same time."""
@@ -85,8 +85,8 @@ class ListView(TemplateView):
 		self.provide_search = True
 
 		# Setup the receivers.
-		self.subscribe('list_button_close', self.close)
-		self.subscribe('list_button_refresh', self.refresh)
+		self.subscribe('button_close', self.close)
+		self.subscribe('button_refresh', self.refresh)
 		self.subscribe('list_button_search', self._search)
 
 		self.subscribe('list_button_first', self._first_page)
@@ -343,7 +343,7 @@ class ListView(TemplateView):
 		right = 215.5
 		for button in buttons:
 			button['right'] = (right - button['width'] / 2)
-			right -= button['width'] + 3
+			right -= button['width'] + 2
 
 		# Add facts.
 		context.update({
