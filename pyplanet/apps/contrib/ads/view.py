@@ -2,8 +2,8 @@ from pyplanet.views.generics.widget import WidgetView
 
 
 class DiscordLogoView(WidgetView):
-	widget_x = 135
-	widget_y = -50
+	widget_x = 133
+	widget_y = -65
 	size_x = 50
 	size_y = 50
 	template_name = 'ads/discord_logo.xml'

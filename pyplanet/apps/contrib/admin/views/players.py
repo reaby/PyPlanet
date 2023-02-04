@@ -119,7 +119,7 @@ class PlayerListView(ManualListView):
 				'width': 12,
 				'action': self.action_ban,
 				'require_confirm': True,
-				'safe': True,
+				'color': "d00",
 			},
 			{
 				'name': 'Blacklist',

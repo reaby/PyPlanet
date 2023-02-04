@@ -9,6 +9,7 @@ class ControllerView(TemplateView):
 		self.id = 'pyplanet__controller'
 
 		self.subscribe('f8', self.action_f8)
+		self.subscribe('f9', self.action_f9)
 
 	async def get_context_data(self):
 		from pyplanet.core import Controller
@@ -25,7 +26,7 @@ class ControllerView(TemplateView):
 		return await super().display(**kwargs)
 
 	async def action_f8(self, player, *args, **kwargs):
-		#await self.manager.instance.chat(
-		#	'$ff0Toggling visibility.', player
-		#)
-		pass
+		await self.manager.instance.chat('$ff0Toggling HUD visibility.', player)
+
+	async def action_f9(self, player, *args, **kwargs):
+		await self.manager.instance.chat('$ff0Toggling HUD visibility when driving.', player)

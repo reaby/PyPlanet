@@ -1,11 +1,13 @@
+// #RequireContext CSmMlScriptIngame
+
 /* ----------------- ToggleUI ------------------ */
 
 Boolean intersect(Vec2 _posA, Vec2 sizeA, Vec2 _posB, Vec2 sizeB) {
-  declare Vec2 scaleUp = <160., 90.>;
-  declare posA = _posA + scaleUp;
-  declare posB = _posB + scaleUp;
-  return MathLib::Max(posA.X, posB.X) < MathLib::Min(posA.X + sizeA.X, posB.X + sizeB.X) &&
-          MathLib::Max(posA.Y, posB.Y) < MathLib::Min(posA.Y + sizeA.Y, posB.Y + sizeB.Y);
+    declare Vec2 scaleUp = <160., 90.>;
+    declare posA = _posA + scaleUp;
+    declare posB = _posB + scaleUp;
+    return MathLib::Max(posA.X, posB.X) < MathLib::Min(posA.X + sizeA.X, posB.X + sizeB.X) &&
+    MathLib::Max(posA.Y, posB.Y) < MathLib::Min(posA.Y + sizeA.Y, posB.Y + sizeB.Y);
 }
 
 
@@ -15,7 +17,7 @@ Void HideWindow(Boolean _anim, Vec2 WindowOrigin) {
     declare SizeX = TextLib::ToReal(Window.DataAttributeGet("sizex"));
     declare SizeY = TextLib::ToReal(Window.DataAttributeGet("sizey"));
 
-                             //  top, left, right, bottom
+    //  top, left, right, bottom
     declare Vec2[] positions = [<-160., 91.>, <-160., 0.>,<130., 0.>,<-120., -90.>];
     declare Vec2[] sizes =     [<320., 3.>, <30., 320.>, <30., 320.>, <180., 30.>];
     declare Vec2[] mult =      [<0., 1.>, <-1. ,0.>, <1., 0.>, <0., -1.>];
@@ -24,9 +26,9 @@ Void HideWindow(Boolean _anim, Vec2 WindowOrigin) {
     declare Real posY = WindowOrigin.Y;
     for(i, 0, 3) {
         if ( intersect(WindowOrigin, <SizeX, SizeY>, positions[i], sizes[i])) {
-             posX = WindowOrigin.X + (mult[i].X * SizeX);
-             posY = WindowOrigin.Y + (mult[i].Y * SizeY);
-             found = True;
+            posX = WindowOrigin.X + (mult[i].X * SizeX);
+            posY = WindowOrigin.Y + (mult[i].Y * SizeY);
+            found = True;
         }
     }
 
@@ -47,12 +49,13 @@ Void ShowWindow(Boolean _anim, Vec2 WindowOrigin) {
     declare Window = (Page.GetFirstChild("Window") as CMlFrame);
     Window.Show();
     if (_anim) {
-       declare Text position =  WindowOrigin.X ^ " " ^ WindowOrigin.Y ;
-       AnimMgr.Add(Window, "<frame pos=\""^ position ^"\"/>", 750, CAnimManager::EAnimManagerEasing::BackOut);
+        declare Text position =  WindowOrigin.X ^ " " ^ WindowOrigin.Y ;
+        AnimMgr.Add(Window, "<frame pos=\""^ position ^"\"/>", 750, CAnimManager::EAnimManagerEasing::BackOut);
     } else {
         Window.RelativePosition_V3 = <WindowOrigin.X,  WindowOrigin.Y>;
     }
 }
+
 
 ***OnInit***
 ***
@@ -72,15 +75,54 @@ if (Net_DistractionFreeMode == True) {
 ***Loop***
 ***
 
-     if (Prev_DistractionFreeMode != Net_DistractionFreeMode) {
-          Prev_DistractionFreeMode = Net_DistractionFreeMode;
-          
-          if (Net_DistractionFreeMode == True) {
-               HideWindow(True, WindowOrigin);
-          } else {
-               ShowWindow(True, WindowOrigin);
-          }
-      }
+if (Prev_DistractionFreeMode != Net_DistractionFreeMode) {
+    Prev_DistractionFreeMode = Net_DistractionFreeMode;
+
+    if (Net_DistractionFreeMode == True) {
+        HideWindow(True, WindowOrigin);
+    } else {
+        ShowWindow(True, WindowOrigin);
+    }
+}
 ***
 
 /* ----------------- End ToggleUI ------------------ */
+
+
+***OnInit***
+***
+declare Boolean override_enable = False;
+declare Vec2 mousePosition = <MouseX, MouseY>;
+declare netwrite Boolean Net_DriveHideMode for UI;
+declare CUIConfig::EUISequence prevSequence;
+if (InputPlayer != Null && Net_DriveHideMode && InputPlayer.Speed >= 2.) {
+    HideWindow(False, WindowOrigin);
+}
+
+***
+
+***Loop***
+***
+
+if (InputPlayer != Null && Net_DriveHideMode) {
+    if (ClientUI.UISequence != prevSequence) {
+        prevSequence = ClientUI.UISequence;
+        if (ClientUI.UISequence == CUIConfig::EUISequence::Finish) {
+            ShowWindow(False, WindowOrigin);
+        }
+    }
+
+    if (InputPlayer.Speed == 0.) {
+        override_enable = False;
+        ShowWindow(False, WindowOrigin);
+    }
+
+    if (InputPlayer.Speed >= 2.) {
+        if (!override_enable) {
+            override_enable = True;
+            HideWindow(False, WindowOrigin);
+        }
+    }
+}
+
+***

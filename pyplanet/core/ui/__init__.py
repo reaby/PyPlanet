@@ -1,14 +1,14 @@
 import asyncio
 import logging
+import os
 
 from xmlrpc.client import Fault
-
 from pyplanet.apps.core.maniaplanet.models import Player
 from pyplanet.core.ui.ui_properties import UIProperties
 from pyplanet.utils.log import handle_exception
+import lxml.etree as eTree
 
 logger = logging.getLogger(__name__)
-
 
 class _BaseUIManager:
 	def __init__(self, instance):
@@ -99,7 +99,13 @@ class _BaseUIManager:
 
 
 				# Add manialink tag to body.
-				body = '<manialink version="{}" id="{}" layer="{}" name="{}" attach="{}">{}</manialink>'.format(manialink.version, manialink.id, layer, name, attachid, body)
+				xml = '<manialink version="{}" id="{}" layer="{}" name="{}" attach="{}">{}</manialink>'.format(manialink.version, manialink.id, layer, name, attachid, body)
+				xml = xml.replace("<!--", "<![CDATA[").replace("-->", "]]>")
+				dom = eTree.XML(xml)
+				dir = os.getcwd()
+				xslt = eTree.parse(dir+"/pyplanet/views/templates/uikit/v1/xlst.xml")
+				transform = eTree.XSLT(xslt)
+				body = eTree.tostring(transform(dom), pretty_print=True).decode()
 
 				# Prepare query
 				queries.append(self.instance.gbx(
@@ -116,7 +122,14 @@ class _BaseUIManager:
 				raise Exception('Manialink has no body or template defined!')
 
 			# Add manialink tag to body.
-			body = '<manialink version="{}" id="{}" layer="{}" name="{}" override="{}">{}</manialink>'.format(manialink.version, manialink.id, layer, name, attachid, body)
+			xml = '<manialink version="{}" id="{}" layer="{}" name="{}" override="{}">{}</manialink>'.format(manialink.version, manialink.id, layer, name, attachid, body)
+			xml = xml.replace("<!--", "<![CDATA[").replace("-->", "]]>")
+			dom = eTree.XML(xml)
+			dir = os.getcwd()
+			xslt = eTree.parse(dir+"/pyplanet/views/templates/uikit/v1/xlst.xml")
+			transform = eTree.XSLT(xslt)
+			body = eTree.tostring(transform(dom), pretty_print=True).decode()
+
 			# Add normal queries.
 			if for_logins and len(for_logins) > 0:
 				for login in for_logins:

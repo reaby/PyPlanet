@@ -13,15 +13,15 @@
       <quad pos="0 0" size="218 8.5" z-index="-5" bgcolor="0003"/>
       {% if provide_search %}
         {% block toolbar_search %}
-            {{ ui.input(search|default('Search...', True), "list_search_field", 2, -4.25, 78) }}
-            {{ ui.button_outline("🔍", id+"__list_button_search", 80, -1.35, 6, 6) }}
+            <Input text="{{ search|default('Search...', True) }}" name="list_search_field" pos="2 -4.25" width="75" />
+            <ButtonOutline text="🔍" action="{{id}}__list_button_search" pos="80 -1.35" size="6 6" />
         {% endblock %}
       {% endif %}
       {% for button in buttons %}
           {% if button.require_confirm %}
-            {{ ui.button_confirm(button.title, id+"__list_buttons_"+loop.index0.__str__(), button.right-(button.width/2), -1.5, button.width, 5) }}
+            <ButtonConfirm text="{{button.title}}" action="{{id}}__list_buttons_{{loop.index0}}" pos="{{ button.right - (button.width/2) }} -1.5" size="{{button.width}} 5" halign="center" />
           {% else %}
-            {{ ui.button_outline(button.title, id+"__list_buttons_"+loop.index0.__str__(), button.right-(button.width/2), -1.5, button.width, 5) }}
+            <ButtonOutline text="{{button.title}}" action="{{id}}__list_buttons_{{loop.index0}}" pos="{{ button.right - (button.width/2) }} -1.5" size="{{button.width}} 5" halign="center"/>
           {% endif %}
       {% endfor %}
     </frame>
@@ -62,29 +62,29 @@
 
             {% for field in fields %}
                 {% if field.type =='checkbox' %}
-                    {{ ui.checkbox("", "checkbox_"+outer_loop.index0.__str__()+"_"+loop.index0.__str__(), field.left, 0, 0, field_renderer(row, field)) }}
+                    <Checkbox text="" name="checkbox_{{outer_loop.index0}}_{{loop.index0}}" pos="{{field.left}} 0" checked="{{field_renderer(row, field)}}" disabled="0" />
                 {% elif field.type == 'entry' %}
-                    {{ ui.input(field_renderer(row, field), "", field.left, -3, field.width) }}
-                {% elif field.manialink %}
+                    <Input text="{{field_renderer(row, field)}}" name="" pos="{{field.left}} -2.5" width="{{field.width}}" />
+               {% elif field.manialink %}
                     {{ field.manialink|safe }}
                 {% else %}
                     {% if field.action %}
                           {% if field.safe %}
                               {% if field.input %}
-                                  {{ ui.input(field_renderer(row, field)|safe, "list_item_"+outer_loop.index0.__str__()+"_"+loop.index0.__str__(), field.left, -2.5, field.width-1) }}
+                                 <Input text="{{field_renderer(row, field)|safe}}" name="list_item_{{outer_loop.index0}}_{{loop.index0}}" pos="{{field.left}} -2.5" width="{{field.width - 1}}" />
                               {% else %}
-                                  {{ ui.button("$fff"+field_renderer(row, field)|safe, id+"__list_body_"+outer_loop.index0.__str__()+"_"+loop.index0.__str__(), field.left, 0, field.width, 5, "textButton", "", "left") }}
+                                  <Button text="$fff{{field_renderer(row, field)|safe}}" action="{{id}}__list_body_{{outer_loop.index0}}_{{loop.index0}}" pos="{{ field.left }} 0" size="{{field.width - 10 }} 5" halign="left" type="transparent"/>
                               {% endif %}
                           {% else %}
                               {% if field.input %}
-                                  {{ ui.input(field_renderer(row, field), "list_item_"+outer_loop.index0.__str__()+"_"+loop.index0.__str__(), field.left, -2.5, field.width-1) }}
+                                  <Input text="{{ field_renderer(row, field) }}" name="list_item_{{outer_loop.index0}}_{{loop.index0}}" pos="{{ field.left }} -2.5" width="{{ field.width - 1}}" />
                               {% else %}
-                                  {{ ui.button("$fff"+field_renderer(row, field), id+"__list_body_"+outer_loop.index0.__str__()+"_"+loop.index0.__str__(), field.left, 0, field.width, 5, "textButton", "", "left") }}
+                                  <Button text="$fff{{ field_renderer(row, field) }}" action="{{id}}__list_body_{{outer_loop.index0}}_{{loop.index0}}" pos="{{ field.left }} 0" size="{{ field.width - 10 }} 5" halign="left" type="transparent"/>
                               {% endif %}
                           {% endif %}
                     {% else %}
                           {% if field.input %}
-                              {{ ui.input(field_renderer(row, field), "list_item_"+outer_loop.index0.__str__()+"_"+loop.index0.__str__(), field.left, -2.5, field.width-1) }}
+                              <Input text="{{field_renderer(row, field)|safe}}" name="list_item_{{outer_loop.index0}}_{{loop.index0}}" pos="{{field.left}} -2.5" width="{{field.width -1 }}" />
                           {% else %}
                               <label pos="{{ field.left }} -2.5" size="{{ field.width }} 5" text="{% if field.safe %}{{ field_renderer(row, field)|safe }}{% else %}{{ field_renderer(row, field) }}{% endif %}" textsize="1.2" halign="left" valign="center2"/>
                           {% endif %}
@@ -102,13 +102,11 @@
 
             {% elif action.type == 'label' %}
                 {% if action.require_confirm %}
-                     {{ ui.button_confirm(action.text|safe, id+"__list_action_"+outer_loop.index0.__str__()+"_"+loop.index0.__str__() , (218 - actions_width + action.left), 0, action.width|default(5, True), 5, action.color) }}
+                  <ButtonConfirm text="{{action.text|safe}}" action="{{id}}__list_action_{{outer_loop.index0}}_{{loop.index0}}" pos="{{ (218 - actions_width + action.left)}} 0" size="{{action.width|default(5, True)}} 5" halign="center" color="{{action.color}}" />
                 {% else %}
-                     {{ ui.button_outline(action.text|safe, id+"__list_action_"+outer_loop.index0.__str__()+"_"+loop.index0.__str__() , (218 - actions_width + action.left ), 0, action.width|default(5, True), 5, action.color) }}
+                  <ButtonOutline text="{{action.text|safe}}" action="{{id}}__list_action_{{outer_loop.index0}}_{{loop.index0}}" pos="{{ (218 - actions_width + action.left)}} 0" size="{{action.width|default(5, True)}} 5" halign="center" color="{{action.color}}" />
                 {% endif %}
-
             {% endif %}
-
             {% endfor %}
 
              {% if loop.index0 % 2 != 0 %}
@@ -121,14 +119,13 @@
         </frame>
 
       <frame pos="0 -110">
+        <Button text="" action="{{id}}__list_button_first" pos="{{ (110-25-20)}} 4" size="8 8" type="transparent"  halign="center"/>
+        <Button text="" action="{{id}}__list_button_prev_10" pos="{{(110-25-12)}} 4" size="8 8" type="transparent" halign="center"/>
+        <Button text="" action="{{id}}__list_button_prev" pos="{{ (110-25-4)}} 4" size="8 8" type="transparent" halign="center"/>
 
-        {{ ui.button("", id+"__list_button_first", (110-25-20),4,8,8, "transparent")}}
-        {{ ui.button("", id+"__list_button_prev_10", (110-25-12),4,8,8, "transparent")}}
-        {{ ui.button("", id+"__list_button_prev", (110-25-4),4,8,8, "transparent")}}
-
-        {{ ui.button("", id+"__list_button_next", (110+25),4,8,8, "transparent")}}
-        {{ ui.button("", id+"__list_button_next_10", (110+25+8),4,8,8, "transparent")}}
-        {{ ui.button("", id+"__list_button_last", (110+25+16),4,8,8, "transparent")}}
+        <Button text="" action="{{id}}__list_button_next" pos="{{ (110+25)}} 4" size="8 8" type="transparent"  halign="center"/>
+        <Button text="" action="{{id}}__list_button_next_10" pos="{{(110+25+8)}} 4" size="8 8" type="transparent" halign="center"/>
+        <Button text="" action="{{id}}__list_button_last" pos="{{ (110+25+16)}} 4" size="8 8" type="transparent" halign="center"/>
 
         <label pos="110 1.5" size="50 5" text="$fff$oPage {{ page }} / {{ pages }}" textsize="1.5" halign="center"/>
       </frame>
