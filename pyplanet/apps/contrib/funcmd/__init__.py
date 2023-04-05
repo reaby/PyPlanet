@@ -100,3 +100,4 @@ class FunCmd(AppConfig):
 			await self.instance.chat('$fff {}$z$s$fff Nice try!'.format(player.nickname))
 		else:
 			await self.instance.chat('$fff {}$z$s$fff Nice time!'.format(player.nickname))
+

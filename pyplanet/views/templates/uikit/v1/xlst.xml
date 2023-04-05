@@ -3,16 +3,36 @@
   <xsl:output method="xml" indent="yes" omit-xml-declaration="yes"/>
 
   <!-- inherit template -->
-  <xsl:template match="@* | node()">
+  <xsl:template match="@*|node()">
     <xsl:copy>
-      <xsl:apply-templates select="@* | node()"/>
+      <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
   </xsl:template>
 
   <!-- match template to manialink -->
   <xsl:template match="/">
-    <xsl:apply-templates select="@* | node()"/>
+    <xsl:apply-templates select="@*|node()"/>
   </xsl:template>
+
+  <!-- <xsl:template match="label">
+    <xsl:copy>
+       <xsl:apply-templates select="@*"/>
+        <xsl:attribute name="class">
+           <xsl:value-of select="concat('wonky', @class)" />
+        </xsl:attribute>
+       <xsl:apply-templates select="node()"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="quad">
+    <xsl:copy>
+       <xsl:apply-templates select="@*"/>
+        <xsl:attribute name="class">
+           <xsl:value-of select="concat('wonky', @class)" />
+        </xsl:attribute>
+       <xsl:apply-templates select="node()"/>
+    </xsl:copy>
+  </xsl:template> -->
 
   <xsl:template match="Checkbox">
     <!--#region uicheckbox parameters-->
@@ -88,17 +108,21 @@
         <frame pos="{$posX + $posXdiv} {($posY - $posYdiv)}" class="uiContainer uiButton">
           <quad size="{$width*2} {$height*2}" scale="0.5" style="Bgs1InRace" class="{@type}" substyle="BgColorContour"
                 halign="center" valign="center2"/>
-          <label size="{ ( $width - 0.5 )} {( $height - 0.5)}" text="{@text}" class="{@type} uiButtonElement" halign="center"
-                 valign="center2" focusareacolor1="0000" focusareacolor2="{@color}" scriptevents="1" translate="0" textsize="1.2"
+          <label size="{ ( $width - 0.5 )} {( $height - 0.5)}" text="{@text}" class="{@type} uiButtonElement"
+                 halign="center"
+                 valign="center2" focusareacolor1="0000" focusareacolor2="{@color}" scriptevents="1" translate="0"
+                 textsize="1.2"
                  action="{@action}"/>
         </frame>
       </xsl:when>
       <xsl:otherwise>
-          <frame pos="{$posX} {($posY - $posYdiv)}" class="uiContainer uiButton">
+        <frame pos="{$posX} {($posY - $posYdiv)}" class="uiContainer uiButton">
           <quad size="{$width*2} {$height*2}" style="Bgs1InRace" class="{@type}" substyle="BgColorContour"
-                halign="center" scale="0.5" valign="center2" />
-          <label size="{( $width - 0.5 )} {( $height - 0.5 )}" text="{@text}" class="{ @type } uiButtonElement" halign="center"
-                 valign="center2" focusareacolor1="0000" focusareacolor2="{@color}" scriptevents="1" translate="0" textsize="1.2"
+                halign="center" scale="0.5" valign="center2"/>
+          <label size="{( $width - 0.5 )} {( $height - 0.5 )}" text="{@text}" class="{ @type } uiButtonElement"
+                 halign="center"
+                 valign="center2" focusareacolor1="0000" focusareacolor2="{@color}" scriptevents="1" translate="0"
+                 textsize="1.2"
                  action="{@action}"/>
         </frame>
       </xsl:otherwise>
@@ -126,7 +150,7 @@
       <xsl:when test="@halign = 'center'">
         <frame pos="{ $posX + $posXdiv} { ( $posY - $posYdiv)}" class="uiContainer uiButton" z-index="2">
           <label size="{ $width } { $height }" text="{ @text }" class="{@type} uiButtonElement" halign="center"
-                 valign="center" scriptevents="1" translate="0" textsize="1.2" action="{ @action }" />
+                 valign="center" scriptevents="1" translate="0" textsize="1.2" action="{ @action }"/>
         </frame>
       </xsl:when>
       <xsl:otherwise>
@@ -147,7 +171,7 @@
     <xsl:param name="valign"/>
     <xsl:param name="text"/>
     <xsl:param name="type"/>
-    <xsl:param name="color" />
+    <xsl:param name="color"/>
     <xsl:param name="posX" select="number(substring-before(concat(@pos,' '),' '))"/>
     <xsl:param name="posY" select="number(substring-after(concat(@pos,' '),' '))"/>
     <xsl:param name="width" select="number(substring-before(concat(@size,' '),' '))"/>
@@ -159,18 +183,22 @@
     <xsl:choose>
       <xsl:when test="@halign = 'center'">
         <frame pos="{$posX +$posXdiv} {($posY - $posYdiv)}" class="uiContainer uiButton" data-action="{@action}">
-           <quad size="{$width*2} {$height*2}" scale="0.5" style="Bgs1InRace" class="{@type}" substyle="BgColorContour"
+          <quad size="{$width*2} {$height*2}" scale="0.5" style="Bgs1InRace" class="{@type}" substyle="BgColorContour"
                 halign="center" valign="center2"/>
-          <label size="{( $width - 0.5)} {($height - 0.5)}" text="{@text}" class="{@type} uiConfirmButtonElement" halign="center"
-                 valign="center" scriptevents="1" focusareacolor1="0000" focusareacolor2="{@color}" translate="0" textsize="1.2"/>
+          <label size="{( $width - 0.5)} {($height - 0.5)}" text="{@text}" class="{@type} uiConfirmButtonElement"
+                 halign="center"
+                 valign="center" scriptevents="1" focusareacolor1="0000" focusareacolor2="{@color}" translate="0"
+                 textsize="1.2"/>
         </frame>
       </xsl:when>
       <xsl:otherwise>
         <frame pos="{$posX} {($posY - $posYdiv)}" class="uiContainer uiButton" data-action="{@action}">
-           <quad size="{$width*2} {$height*2}" scale="0.5" style="Bgs1InRace" class="{@type}" substyle="BgColorContour"
+          <quad size="{$width*2} {$height*2}" scale="0.5" style="Bgs1InRace" class="{@type}" substyle="BgColorContour"
                 halign="center" valign="center2"/>
-          <label size="{ ($width - 0.5)} {($height - 0.5)}" text="{@text}" class="{@type} uiConfirmButtonElement" halign="center"
-                 valign="center" scriptevents="1" focusareacolor1="0000" focusareacolor2="{@color}" translate="0" textsize="1.2"/>
+          <label size="{ ($width - 0.5)} {($height - 0.5)}" text="{@text}" class="{@type} uiConfirmButtonElement"
+                 halign="center"
+                 valign="center" scriptevents="1" focusareacolor1="0000" focusareacolor2="{@color}" translate="0"
+                 textsize="1.2"/>
         </frame>
       </xsl:otherwise>
     </xsl:choose>
@@ -190,7 +218,8 @@
       <entry pos="0 0" size="{($width - 5)} 5" textsize="1.2" valign="center" focusareacolor1="0003"
              selecttext="1" focusareacolor2="FFF2" default="{@text}" textformat="Password" name="{@name}"/>
       <frame pos="{($width - 2.5)} 0" class="">
-        <quad size="10 10" scale="0.5" style="Bgs1InRace" colorize="ddd" substyle="BgColorContour" halign="center" valign="center2"/>
+        <quad size="10 10" scale="0.5" style="Bgs1InRace" colorize="ddd" substyle="BgColorContour" halign="center"
+              valign="center2"/>
         <label size="4 4" text="" class="uiMaskedToggle" halign="center" valign="center2" focusareacolor1="0000"
                focusareacolor2="ddd" scriptevents="1" translate="0" textsize="1.2"/>
       </frame>
@@ -203,13 +232,13 @@
     <xsl:param name="text"/>
     <xsl:param name="name"/>
     <xsl:param name="pos"/>
-    <xsl:param name="id" />
-    <xsl:param name="class" />
+    <xsl:param name="id"/>
+    <xsl:param name="class"/>
     <xsl:param name="width" select="number(substring-before(concat(@size,' '),' '))"/>
     <xsl:param name="height" select="number(substring-after(concat(@size,' '),' '))"/>
     <!--#endregion -->
     <!--#region input definition-->
-   <frame pos="{ @pos }" class="uiContainer uiInput" data-type="Basic" id="@id">
+    <frame pos="{ @pos }" class="uiContainer uiInput" data-type="Basic" id="@id">
       <entry pos="0 0" size="{ @width } 5" textsize="1.2" valign="center" class="uiEntry"
              default="{ @text }" selecttext="1" scriptevents="1" textformat="Basic" name="{ @name }" z-index="2"/>
     </frame>
@@ -291,4 +320,6 @@
     </frame>
   </xsl:template>
 
+
 </xsl:stylesheet>
+

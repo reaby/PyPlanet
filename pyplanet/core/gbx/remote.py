@@ -23,7 +23,7 @@ class GbxRemote:
 	MAX_REQUEST_SIZE = 2000000  # 2MB
 	MAX_RESPONSE_SIZE = 4000000  # 4MB
 
-	def __init__(self, host, port, event_pool=None, user=None, password=None, api_version='2022-03-21', instance=None):
+	def __init__(self, host, port, event_pool=None, user=None, password=None, api_version='2023-03-24', instance=None):
 		"""
 		Initiate the GbxRemote client.
 

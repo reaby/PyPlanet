@@ -164,7 +164,7 @@ class Karma(AppConfig):
 		await self.mx_karma.player_connect(player=player)
 		await self.widget.display(player=player)
 
-	async def player_chat(self, player, text, cmd):
+	async def player_chat(self, player, text, cmd, options):
 		if not cmd:
 			if text == '+++' or text == '++' or text == '+' or text == '+-' or text == '-+' or text == '-' or text == '--' or text == '---':
 				expanded_voting = await self.setting_expanded_voting.get_value()

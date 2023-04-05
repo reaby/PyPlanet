@@ -25,17 +25,18 @@ async def handle_player_disconnect(source, signal, **kwargs):
 	)
 
 async def handle_player_chat(source, signal, **kwargs):
-	player_uid, player_login, text, cmd = source
+	player_uid, player_login, text, cmd, options=source
+
 	if Controller.instance.game.server_player_login == player_login and Controller.instance.game.server_is_dedicated:
 		# Inform our server_chat signal.
-		asyncio.ensure_future(server_chat.send_robust(dict(text=text, cmd=cmd)))
+		asyncio.ensure_future(server_chat.send_robust(dict(text=text, cmd=cmd, options=options)))
 		raise SignalGlueStop('We won\'t inform anything about the chat we send ourself!')
 	try:
 		player = await Controller.instance.player_manager.get_player(login=player_login, lock=True)
 	except:
 		raise SignalGlueStop()
 	return dict(
-		player=player, text=text, cmd=cmd
+		player=player, text=text, cmd=cmd, options=options
 	)
 
 

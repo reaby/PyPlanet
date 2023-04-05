@@ -324,9 +324,6 @@ class LocalRecords(AppConfig):
 				'own_records': current_records,
 				'own_record': current_record
 			})
-		top_gain = self.instance.apps.apps["topgains"]
-		if top_gain is not None:
-			await top_gain.update_record(player, previous_index, new_index)
 
 		if self.widget is None:
 			self.widget = LocalRecordsWidget(self)
@@ -341,6 +338,9 @@ class LocalRecords(AppConfig):
 
 		# Reload map referenced information
 		asyncio.ensure_future(self.load_map_locals(map=self.instance.map_manager.current_map))
+		top_gain = self.instance.apps.apps["topgains"]
+		if top_gain is not None:
+			await top_gain.update_record(player, previous_index, new_index)
 
 	async def chat_current_record(self):
 		record_limit = await self.setting_record_limit.get_value()

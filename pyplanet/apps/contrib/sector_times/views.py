@@ -76,8 +76,8 @@ class SectorTimesWidget(WidgetView):
 
 
 class CheckpointDiffWidget(WidgetView):
-	widget_x = -10
-	widget_y = 27
+	widget_x = 0
+	widget_y = 0
 	template_name = 'sector_times/cp_diff.xml'
 
 	def __init__(self, app):

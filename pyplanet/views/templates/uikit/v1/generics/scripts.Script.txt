@@ -1,3 +1,6 @@
+// #RequireContext CSmMlScriptIngame
+// #Include "MathLib" as MathLib
+
 /* ------------------- Button ------------------------- */
 Void TriggerButtonClick(CMlControl Control) {
     declare Parent = Control.Parent;
@@ -266,6 +269,7 @@ if (Event.Control.HasClass("uiSelectElement")) {
 ***
 
 /*  ------------------- end masked input ------------------------- */
+
 /*  ------------------- Scrollable area ------------------------- */
 
 ***OnInit***
@@ -328,8 +332,9 @@ if (MouseLeftButton == False)  {
 }
 
 foreach (frame in Frames) {
-       (frame.Parent.Controls[1] as CMlFrame).Controls[0].RelativePosition_V3.Y =  -(4.0+ (frame.ScrollOffset.Y / frame.ScrollMax.Y) * (frame.Controls[0].Size.Y -18.));
+       (frame.Parent.Controls[1] as CMlFrame).Controls[0].RelativePosition_V3.Y =  -(4.0+ (frame.ScrollOffset.Y / (frame.ScrollMax.Y + 0.1)) * (frame.Controls[0].Size.Y -18.));
 }
 ***
 
 /*  ------------------- end Scrollable area ------------------------- */
+
