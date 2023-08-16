@@ -62,9 +62,7 @@ class StatisticsProcessor:
 		:rtype: int
 		"""
 		if self.app.instance.game.game == 'tm':
-			return await Score.objects.count(
-				Score.select(Score).where(Score.player == player)
-			)
+			return (await Score.select(Score).where(Score.player == player)).finishes
 		return False
 
 	async def get_num_records(self, player):

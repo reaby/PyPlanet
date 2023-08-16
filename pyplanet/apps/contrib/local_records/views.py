@@ -176,6 +176,14 @@ class LocalRecordsListView(ManualListView):
 			'type': 'label'
 		},
 		{
+			'name': 'Date',
+			'index': 'record_date',
+			'sorting': True,
+			'searching': False,
+			'width': 30,
+			'type': 'label'
+		},
+		{
 			'name': 'Difference',
 			'index': 'record_time_difference',
 			'sorting': True,
@@ -213,7 +221,8 @@ class LocalRecordsListView(ManualListView):
 				'id': item.get_id(),
 				'index': index, 'player_nickname': record_player.nickname,
 				'record_time': times.format_time(item.score),
-				'record_time_difference': record_time_difference
+				'record_time_difference': record_time_difference,
+				'record_date': item.updated_at
 			})
 			index += 1
 

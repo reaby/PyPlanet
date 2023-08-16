@@ -4,7 +4,7 @@ Map Admin methods and functions.
 import asyncio
 import logging
 from argparse import Namespace
-from random import shuffle
+import random
 
 from pyplanet.apps.core.maniaplanet.models import Map
 from pyplanet.conf import settings
@@ -214,10 +214,10 @@ class MapAdmin:
 		await self.instance.gbx('RemoveMapList', file_names)
 
 		# Shuffle map file names.
-		shuffle(file_names)
+		new_names = random.sample(file_names, len(file_names))
 
 		# Re-add all maps in new order.
-		await self.instance.gbx('AddMapList', file_names)
+		await self.instance.gbx('AddMapList', new_names)
 
 		# Send message + reload all maps in memory.
 		await asyncio.gather(

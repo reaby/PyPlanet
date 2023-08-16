@@ -18,7 +18,7 @@ RUN chown -R maniaplanet:maniaplanet $PROJECT_ROOT
 
 # Install PyPlanet.
 RUN pip install -r requirements.txt
-RUN pip install python-Levenshtein
+RUN pip install -r require_docker.txt
 RUN chmod +x cli.py
 
 USER maniaplanet

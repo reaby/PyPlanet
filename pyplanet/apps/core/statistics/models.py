@@ -26,6 +26,11 @@ class Score(Model):
 	The checkpoint times, separated by commas.
 	"""
 
+	finishes = IntegerField(default=0)
+	"""
+		finishes count
+	"""
+
 	created_at = DateTimeField(
 		default=datetime.datetime.now,
 	)

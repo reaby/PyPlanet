@@ -1,9 +1,6 @@
 {% extends 'core.views/uikit/v1/generics/bootstrap.xml' %}
 
 {% block main %}
-
-
-{% block main %}
 <frame pos="65 -83" z-index="110" id="admin_toolbar_bar_frame">
   <quad pos="0 0" z-index="0" size="26 6" bgcolor="00000060"/>
   <quad pos="26.5 0" z-index="0" size="25.75 6" bgcolor="00000060"/>

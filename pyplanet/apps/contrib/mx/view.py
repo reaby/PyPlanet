@@ -304,7 +304,7 @@ class MxSearchListView(ManualListView):
 				"limit": 100,
 				"tpack": self.app.instance.game.dedicated_title.split("@", 1)[0]
 			}
-			if self.style is not "-1":
+			if self.style != "-1":
 				options['style'] = self.style
 
 			if trackname is not None:

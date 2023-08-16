@@ -75,7 +75,7 @@ class LocalRecords(AppConfig):
 			query = (model_alias.select(fn.RANK().over(partition_by=[model_alias.map_id],
 													   order_by=[model_alias.score.asc()]).alias('local_rank'),
 										model_alias)
-					 .order_by(model_alias.score.asc())
+					 .order_by(LocalRecord.score.asc(), LocalRecord.updated_at.asc())
 					 .alias(name))
 			return query
 
@@ -154,7 +154,7 @@ class LocalRecords(AppConfig):
 			LocalRecord.select(LocalRecord, Player)
 				.join(Player)
 				.where(LocalRecord.map_id == map.get_id())
-				.order_by(LocalRecord.score.asc())
+				.order_by(LocalRecord.score.asc(), LocalRecord.updated_at.asc())
 		)
 
 		return {
@@ -176,7 +176,7 @@ class LocalRecords(AppConfig):
 			LocalRecord.select(LocalRecord, Player)
 				.join(Player)
 				.where(LocalRecord.map_id == map.get_id())
-				.order_by(LocalRecord.score.asc())
+				.order_by(LocalRecord.score.asc(), LocalRecord.updated_at.asc())
 		)
 
 		rank = 1
@@ -204,7 +204,7 @@ class LocalRecords(AppConfig):
 			LocalRecord.select(LocalRecord, Player)
 				.join(Player)
 				.where(LocalRecord.map_id == self.instance.map_manager.current_map.get_id())
-				.order_by(LocalRecord.score.asc())
+				.order_by(LocalRecord.score.asc(), LocalRecord.updated_at.asc())
 		)
 		self.current_records = list(record_list)
 
@@ -338,9 +338,10 @@ class LocalRecords(AppConfig):
 
 		# Reload map referenced information
 		asyncio.ensure_future(self.load_map_locals(map=self.instance.map_manager.current_map))
-		top_gain = self.instance.apps.apps["topgains"]
-		if top_gain is not None:
-			await top_gain.update_record(player, previous_index, new_index)
+		if "topgains" in self.instance.apps.apps:
+			top_gain = self.instance.apps.apps["topgains"]
+			if top_gain is not None:
+				await top_gain.update_record(player, previous_index, new_index)
 
 	async def chat_current_record(self):
 		record_limit = await self.setting_record_limit.get_value()

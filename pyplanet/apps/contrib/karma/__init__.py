@@ -174,9 +174,16 @@ class Karma(AppConfig):
 
 				if self.instance.game.game == 'tm' or self.instance.game.game == 'tmnext':
 					finishes_required = await self.setting_finishes_before_voting.get_value()
-					player_finishes = await Score.objects.count(Score.select().where(Score.map_id == self.instance.map_manager.current_map.get_id()).where(Score.player_id == player.get_id()))
+					score_stats = await Score.execute(
+						Score.select().where(Score.map_id == self.instance.map_manager.current_map.get_id()).where(
+							Score.player_id == player.get_id()))
+					player_finishes = 0
+					if score_stats and len(score_stats) > 0:
+						player_finishes = score_stats[0].finishes
+
 					if player_finishes < finishes_required:
-						message = '$i$f00You have to finish this map at least $fff{}$f00 times before voting!'.format(finishes_required)
+						message = '$i$f00You have to finish this map at least $fff{}$f00 times before voting!'.format(
+							finishes_required)
 						await self.instance.chat(message, player)
 						return
 
@@ -202,13 +209,17 @@ class Karma(AppConfig):
 						player_vote.expanded_score = score
 						await player_vote.save()
 
-						map = next((m for m in self.instance.map_manager.maps if m.uid == self.instance.map_manager.current_map.uid), None)
+						map = next((m for m in self.instance.map_manager.maps if
+									m.uid == self.instance.map_manager.current_map.uid), None)
 						if map is not None:
 							map.karma = await self.get_map_karma(self.instance.map_manager.current_map)
 
 						message = '$ff0Successfully changed your karma vote to $fff{}$ff0{}!'.format(text,
-							(' (same as $fff{}$ff0)'.format(text[:2]) if text == '+++' or text == '---' else '')
-						)
+																									 (
+																										 ' (same as $fff{}$ff0)'.format(
+																											 text[
+																											 :2]) if text == '+++' or text == '---' else '')
+																									 )
 						await self.calculate_karma()
 						await asyncio.gather(
 							self.instance.chat(message, player),
@@ -219,19 +230,22 @@ class Karma(AppConfig):
 						await player_vote.save()
 						await self.instance.chat(message, player)
 				else:
-					new_vote = KarmaModel(map=self.instance.map_manager.current_map, player=player, score=normal_score, expanded_score=score)
+					new_vote = KarmaModel(map=self.instance.map_manager.current_map, player=player, score=normal_score,
+										  expanded_score=score)
 					await new_vote.save()
 
 					self.current_votes.append(new_vote)
 					await self.calculate_karma()
 
-					map = next((m for m in self.instance.map_manager.maps if m.uid == self.instance.map_manager.current_map.uid), None)
+					map = next((m for m in self.instance.map_manager.maps if
+								m.uid == self.instance.map_manager.current_map.uid), None)
 					if map is not None:
 						map.karma = await self.get_map_karma(self.instance.map_manager.current_map)
 
 					message = '$ff0Successfully voted $fff{}$ff0{}!'.format(text,
-						(' (same as $fff{}$ff0)'.format(text[:2]) if text == '+++' or text == '---' else '')
-					)
+																			(' (same as $fff{}$ff0)'.format(text[
+																											:2]) if text == '+++' or text == '---' else '')
+																			)
 					await asyncio.gather(
 						self.instance.chat(message, player),
 						self.widget.display()
@@ -257,7 +271,7 @@ class Karma(AppConfig):
 		if days <= no_decrease_days:
 			return score
 		else:
-			power = (decrease_period - (days-no_decrease_days)) / decrease_period
+			power = (decrease_period - (days - no_decrease_days)) / decrease_period
 			if power > 0:
 				return score * power
 			return None
@@ -278,7 +292,8 @@ class Karma(AppConfig):
 		)
 
 	async def get_votes_list(self, map):
-		vote_list = await KarmaModel.objects.execute(KarmaModel.select(KarmaModel, Player).join(Player).where(KarmaModel.map_id == map.get_id()))
+		vote_list = await KarmaModel.objects.execute(
+			KarmaModel.select(KarmaModel, Player).join(Player).where(KarmaModel.map_id == map.get_id()))
 		self.current_votes = list(vote_list)
 
 	async def calculate_karma(self):
@@ -308,10 +323,11 @@ class Karma(AppConfig):
 	async def chat_current_karma(self):
 		mx_karma = ''
 		if self.mx_karma.api.activated:
-			mx_karma = ', MX: $fff{}%$ff0 [$fff{}$ff0 votes]'.format(round(self.mx_karma.current_average*10)/10, self.mx_karma.current_count)
+			mx_karma = ', MX: $fff{}%$ff0 [$fff{}$ff0 votes]'.format(round(self.mx_karma.current_average * 10) / 10,
+																	 self.mx_karma.current_count)
 
 		num_current_votes = len(self.current_votes)
 		message = '$ff0Current map karma: $fff{}$ff0 ($fff{}%$ff0) [$fff{}$ff0 votes]{}'.format(
-			round(self.current_karma, 1), round(self.current_karma_percentage * 100,2), num_current_votes, mx_karma
+			round(self.current_karma, 1), round(self.current_karma_percentage * 100, 2), num_current_votes, mx_karma
 		)
 		await self.instance.chat(message)

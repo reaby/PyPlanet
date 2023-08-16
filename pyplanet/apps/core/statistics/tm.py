@@ -5,11 +5,13 @@ from pyplanet.apps.core.statistics.models import Score
 from pyplanet.apps.core.statistics.views.dashboard import StatsDashboardView
 from pyplanet.apps.core.statistics.views.records import TopSumsView
 from pyplanet.apps.core.statistics.views.score import StatsScoresListView, CheckpointComparisonView
-from pyplanet.apps.core.trackmania.callbacks import finish
+from pyplanet.apps.core.trackmania.callbacks import finish, give_up
 from pyplanet.contrib.command import Command
+from pyplanet.apps.core.maniaplanet.models import Player
 
 
 class TrackmaniaComponent:
+
 	def __init__(self, app):
 		"""
 		Initiate trackmania statistics component.
@@ -21,6 +23,11 @@ class TrackmaniaComponent:
 
 	async def on_init(self):
 		pass
+
+	async def get_without_failing(self, player):
+		curr = self.app.instance.map_manager.current_map.get_id()
+		results = await Score.execute(Score.select().where((Score.player == player.get_id()) & (Score.map == curr)).limit(1))
+		return results[0] if len(results) > 0 else None
 
 	async def on_start(self):
 		# Listen to signals.
@@ -38,12 +45,22 @@ class TrackmaniaComponent:
 
 	async def on_finish(self, player, race_time, lap_time, cps, flow, raw, **kwargs):
 		# Register the score of the player.
-		await Score(
-			player=player,
-			map=self.app.instance.map_manager.current_map,
-			score=race_time,
-			checkpoints=','.join([str(cp) for cp in cps])
-		).save()
+		if isinstance(player, Player):
+			obj = await self.get_without_failing(player)
+			if obj is not None:
+				obj.finishes = int(obj.finishes + 1)
+				if obj.score and int(race_time) < obj.score:
+					obj.score = int(race_time)
+					obj.checkpoints = str(','.join([str(cp) for cp in cps]))
+				await obj.save()
+			else:
+				await Score(
+					player=player,
+					map=self.app.instance.map_manager.current_map,
+					score=race_time,
+					checkpoints=','.join([str(cp) for cp in cps]),
+					finishes=1
+				).save()
 
 	async def open_stats(self, player, **kwargs):
 		view = StatsDashboardView(self.app, self.app.context.ui, player)

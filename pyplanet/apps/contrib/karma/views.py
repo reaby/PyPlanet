@@ -64,10 +64,10 @@ class KarmaWidget(WidgetView):
 		await self.app.show_map_list(player)
 
 	async def action_vote_positive(self, player, action, values, **kwargs):
-		await self.app.player_chat(player, '++', False)
+		await self.app.player_chat(player, '++', False, None)
 
 	async def action_vote_negative(self, player, action, values, **kwargs):
-		await self.app.player_chat(player, '--', False)
+		await self.app.player_chat(player, '--', False, None)
 
 
 class KarmaListView(ManualListView):

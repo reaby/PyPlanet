@@ -121,7 +121,7 @@
       <frame pos="0 -110">
         <Button text="" action="{{id}}__list_button_first" pos="{{ (110-25-20)}} 4" size="8 8" type="transparent"  halign="center"/>
         <Button text="" action="{{id}}__list_button_prev_10" pos="{{(110-25-12)}} 4" size="8 8" type="transparent" halign="center"/>
-        <Button text="" action="{{id}}__list_button_prev" pos="{{ (110-25-4)}} 4" size="8 8" type="transparent" halign="center"/>
+        <Button text="" action="{{id}}__list_button_prev" pos="{{ (110-25-4)}} 4" size="8 8" type="transparent" halign="center"/>
 
         <Button text="" action="{{id}}__list_button_next" pos="{{ (110+25)}} 4" size="8 8" type="transparent"  halign="center"/>
         <Button text="" action="{{id}}__list_button_next_10" pos="{{(110+25+8)}} 4" size="8 8" type="transparent" halign="center"/>
