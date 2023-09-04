@@ -1,6 +1,4 @@
-{% import 'core.views/uikit/v1/generics/ui.xml' as ui %}
 {% include 'core.views/uikit/v1/generics/style.xml' %}
-
 
 {% block main %}
 <!-- template contents will be inserted here -->

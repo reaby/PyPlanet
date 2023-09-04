@@ -22,6 +22,7 @@ class Karma(AppConfig):
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
+		self.lock = asyncio.Lock()
 
 		self.current_votes = []
 		self.current_karma = 0.0
@@ -87,7 +88,7 @@ class Karma(AppConfig):
 		self.widget = KarmaWidget(self)
 		await self.widget.display()
 
-		await self.load_map_votes()
+		# await self.load_map_votes()
 
 	async def setting_update_karma(self, oldval, newval):
 		await self.get_votes_list(self.instance.map_manager.current_map)
@@ -165,7 +166,12 @@ class Karma(AppConfig):
 		await self.widget.display(player=player)
 
 	async def player_chat(self, player, text, cmd, options):
-		if not cmd:
+		# Ignore if command is given.
+		if cmd:
+			return
+
+		# Acquire the lock for the voting array.
+		async with self.lock:
 			if text == '+++' or text == '++' or text == '+' or text == '+-' or text == '-+' or text == '-' or text == '--' or text == '---':
 				expanded_voting = await self.setting_expanded_voting.get_value()
 				if expanded_voting is False:

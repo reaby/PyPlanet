@@ -1,6 +1,59 @@
 Changelog
 =========
 
+0.11.0-rc1
+----------
+
+Core
+~~~~
+
+* Improvement: Upgraded python packages to use :code:`aiohttp==3.8.5`, :code:`async-timeout<5.0.0`, :code:`requests==2.27.1`, and :code:`cryptography==40.0.2`.
+* Improvement: Update order of in-memory map list in map manager after shuffling the list (#687).
+* Improvement: Added :code:`name` attribute to ManiaLink tag, ensuring recognizability when debugging ManiaScript (thanks to w1lla) (#1213).
+
+* Bugfix: Fixing style stripper to be more realistic with in-game renderer (thanks to skybaks) (#1249).
+
+Apps
+~~~~
+
+* Feature: Added Race Rankings widget to replace in-game provided widget only displaying the first few finishing players (#1097).
+* Feature: Added admin commands for setting the maximum players and spectators on the server (#1197).
+* Feature: Added :code:`/muffin` command to the fun commands app (#1220).
+
+* Improvement: Added clickable player names in Live Rankings widget to switch spectator target (#1087).
+* Improvement: Added button to rankings lists to add map to map folder (#1218).
+* Improvement: Avoid unnecessarily retrieving player for local record, instead using already retrieved :code:`record.player` (thanks to reaby) (#893).
+* Improvement: Live Rankings no longer displays Rounds/Team/Cup standings in warm-up.
+
+* Bugfix: Fixing map info widget displaying author of the previous map by waiting for the map to be loaded (thanks to reaby) (#1191).
+* Bugfix: Fixing live rankings displaying invalid added points due to ping issues, by sorting finishes list on every finish (thanks to skybaks).
+* Bugfix: Fixing the reboot admin command on Windows machines (thanks to w1lla).
+* Bugfix: Fixing duplicate karma votes, by adding a unique constraint and removing the duplicate votes (#998).
+
+0.10.5
+------
+
+Core
+~~~~
+
+* Improvement: Removed :code:`\x92` character and :code:`<hidden>` values from mode settings descriptions (#1219).
+
+* Bugfix: Fixing crash on start when using PostgreSQL database backend (thanks to lel-amri) (#1126).
+* Bugfix: Fixing list template background with no search, but with buttons (thanks to skybaks) (#1232).
+* Bugfix: Fixing log rollover with TimedRotatingFileHandler for Windows (thanks to w1lla) (#1089).
+* Bugfix: Fixing sorting with None values in list generics (#1245).
+* Bugfix: Fixing default value for confirmation alert pop-up (#1244).
+
+Apps
+~~~~
+
+* Feature: Added option to vote to go to the previous map (#1223).
+
+* Improvement: Ceil amount of votes required for vote to pass (#1246).
+
+* Bugfix: Fixing retrieval of correct amount of Discord users for servers with over 100 users (thanks to froznsm) (#1208).
+* Bugfix: Fixing rankings calculations for newer MariaDB versions (thanks to reaby) (#1238).
+
 0.10.4
 ------
 

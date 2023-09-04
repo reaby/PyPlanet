@@ -5,19 +5,15 @@
   {% block title %}
       {% if title %}
           {% if open_action %}
-          <label pos="17.5 -3" z-index="1" size="35 6" text="$t$i{{ title }}" textsize="1.2"
-                 textemboss="0" halign="center" valign="center2" textfont="GameFontSemiBold"
-                 action="{{ id }}__open_widget" scriptevents="1" focusareacolor1="000b" focusareacolor2="000a" />
+          <label pos="2 -2.25" z-index="3" size="35 4" text="$t$i{{ title }}" valign="center2" textfont="GameFontExtraBold" textprefix="$i$t" textsize="1" halign="left" action="{{ id }}__open_widget" focusareacolor1="0000" focusareacolor2="0000"/>
           {% else %}
-          <label pos="17.5 -3" z-index="1" size="35 6" text="$t$i{{ title }}" textsize="1.2" textfont="GameFontSemiBold"
-                 textemboss="0" scriptevents="1" halign="center" valign="center2" focusareacolor1="000a" focusareacolor2="000a"/>
+           <label pos="2 -2.25" z-index="3" size="35 4" text="$t$i{{ title }}" valign="center2" textfont="GameFontExtraBold" textprefix="$i$t" textsize="1" halign="left" focusareacolor1="0000" focusareacolor2="0000"/>
           {% endif %}
-          <quad pos="0 -6" size="35 0.25" bgcolor="FFF" />
-
+				<quad z-index="2" pos="20 -2"  size="40 4.1" image="file://Media/Painter/Stencils/15-Stripes/_Stripe0Grad/Brush.tga" modulatecolor="108AEEFF" halign="center" valign="center"/>
       {% endif %}
   {% endblock %}
 
-  <frame pos="0 {% if title %}-6.5{% else %}0{% endif %}">
+  <frame pos="0 {% if title %}-4.5{% else %}0{% endif %}">
     {% block content %}{% endblock %}
   </frame>
 

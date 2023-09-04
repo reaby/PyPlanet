@@ -1,7 +1,7 @@
 {% extends 'core.views/uikit/v1/list.xml' %}
 
 {% block toolbar_search %}
-  {{ ui.input(search_map|default('Search Map...', True), "map", 2, -4.5, 40) }}
-  {{ ui.input(search_author|default('Search Author...', True), "author", 43, -4.5, 40) }}
-  {{ ui.button("🔍 search", id+"__mx_search", 85, -2, 24, 5) }}
+  <Input text="{{search_map|default('Search Map...', True)}}" name="map" pos="2 -4.5" size="40 5" />
+  <Input text="{{search_author|default('Search Author...', True)}}" name="author" pos="43 -4.5" size="40 5" />
+  <Button text="🔍 search" action="{{id}}__mx_search" pos="85 2" size="24 5" />
 {% endblock %}

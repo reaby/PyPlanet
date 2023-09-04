@@ -1,9 +1,20 @@
 {% extends 'core.views/uikit/v1/list.xml' %}
 
 {% block toolbar_search %}
-  {{ ui.input(search_map|default('Search Map...', True), "map", 2, -4.5, 40) }}
-  {{ ui.input(search_author|default('Search Author...', True), "author", 43, -4.5, 40) }}
-  {{ ui.dropdown(mode,"mode", mode_index, 84, -2, 35) }}
-  {{ ui.dropdown(styles,"style", style_index, 120, -2, 35) }}
-  {{ ui.button("🔍 search", id+"__mx_search", 157, -2, 24, 5) }}
+  <Input text="{{search_map|default('Search Map...', True)}}" name="map" pos="2 -4.5" size="40 6" />
+  <Input text="{{search_author|default('Search Author...', True)}}" name="author" pos="43 -4.5" size="40 6" />
+
+  <Dropdown name="mode" pos="84 -2" size="35 5" selectedindex="{{mode_index}}" >
+    {% for entry in mode %}
+      <Option text="{{entry.text}}" value="{{entry.value}}"/>
+    {% endfor %}
+  </Dropdown>
+
+  <Dropdown name="style" pos="120 -2" size="35 5" selectedindex="{{style_index}}" >
+    {% for entry in styles %}
+      <Option text="{{entry.text}}" value="{{entry.value}}"/>
+    {% endfor %}
+  </Dropdown>
+
+  <ButtonOutline text="🔍 search" action="{{id}}__mx_search" pos="170 -2" size="24 5" />
 {% endblock %}

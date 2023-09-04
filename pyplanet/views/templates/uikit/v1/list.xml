@@ -13,7 +13,7 @@
       <quad pos="0 0" size="218 8.5" z-index="-5" bgcolor="0003"/>
       {% if provide_search %}
         {% block toolbar_search %}
-            <Input text="{{ search|default('Search...', True) }}" name="list_search_field" pos="2 -4.25" width="75" />
+            <Input text="{{ search|default('Search...', True) }}" name="list_search_field" pos="2 -4.25" size="75 5" />
             <ButtonOutline text="🔍" action="{{id}}__list_button_search" pos="80 -1.35" size="6 6" />
         {% endblock %}
       {% endif %}
@@ -64,27 +64,27 @@
                 {% if field.type =='checkbox' %}
                     <Checkbox text="" name="checkbox_{{outer_loop.index0}}_{{loop.index0}}" pos="{{field.left}} 0" checked="{{field_renderer(row, field)}}" disabled="0" />
                 {% elif field.type == 'entry' %}
-                    <Input text="{{field_renderer(row, field)}}" name="" pos="{{field.left}} -2.5" width="{{field.width}}" />
+                    <Input text="{{field_renderer(row, field)}}" name="" pos="{{field.left}} -2.5" size="{{field.width}} 5" />
                {% elif field.manialink %}
                     {{ field.manialink|safe }}
                 {% else %}
                     {% if field.action %}
                           {% if field.safe %}
                               {% if field.input %}
-                                 <Input text="{{field_renderer(row, field)|safe}}" name="list_item_{{outer_loop.index0}}_{{loop.index0}}" pos="{{field.left}} -2.5" width="{{field.width - 1}}" />
+                                 <Input text="{{field_renderer(row, field)|safe}}" name="list_item_{{outer_loop.index0}}_{{loop.index0}}" pos="{{field.left}} -2.5" size="{{field.width - 1}} 5" />
                               {% else %}
                                   <Button text="$fff{{field_renderer(row, field)|safe}}" action="{{id}}__list_body_{{outer_loop.index0}}_{{loop.index0}}" pos="{{ field.left }} 0" size="{{field.width - 10 }} 5" halign="left" type="transparent"/>
                               {% endif %}
                           {% else %}
                               {% if field.input %}
-                                  <Input text="{{ field_renderer(row, field) }}" name="list_item_{{outer_loop.index0}}_{{loop.index0}}" pos="{{ field.left }} -2.5" width="{{ field.width - 1}}" />
+                                  <Input text="{{ field_renderer(row, field) }}" name="list_item_{{outer_loop.index0}}_{{loop.index0}}" pos="{{ field.left }} -2.5" size="{{ field.width - 1}} 5" />
                               {% else %}
                                   <Button text="$fff{{ field_renderer(row, field) }}" action="{{id}}__list_body_{{outer_loop.index0}}_{{loop.index0}}" pos="{{ field.left }} 0" size="{{ field.width - 10 }} 5" halign="left" type="transparent"/>
                               {% endif %}
                           {% endif %}
                     {% else %}
                           {% if field.input %}
-                              <Input text="{{field_renderer(row, field)|safe}}" name="list_item_{{outer_loop.index0}}_{{loop.index0}}" pos="{{field.left}} -2.5" width="{{field.width -1 }}" />
+                              <Input text="{{field_renderer(row, field)|safe}}" name="list_item_{{outer_loop.index0}}_{{loop.index0}}" pos="{{field.left}} -2.5" size="{{field.width -1 }} 5" />
                           {% else %}
                               <label pos="{{ field.left }} -2.5" size="{{ field.width }} 5" text="{% if field.safe %}{{ field_renderer(row, field)|safe }}{% else %}{{ field_renderer(row, field) }}{% endif %}" textsize="1.2" halign="left" valign="center2"/>
                           {% endif %}

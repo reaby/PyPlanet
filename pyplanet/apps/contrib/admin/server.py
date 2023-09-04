@@ -4,6 +4,7 @@ Server Admin methods and functions.
 import asyncio
 
 from pyplanet.apps.core.maniaplanet.callbacks.player import player_chat
+from pyplanet.conf import settings
 from pyplanet.contrib.command import Command
 from xmlrpc.client import Fault
 
@@ -25,6 +26,7 @@ class ServerAdmin:
 		await self.instance.permission_manager.register('callvoting', 'Handle server callvoting', app=self.app, min_level=1)
 		await self.instance.permission_manager.register('password', 'Set the server passwords', app=self.app, min_level=2)
 		await self.instance.permission_manager.register('servername', 'Set the server name', app=self.app, min_level=2)
+		await self.instance.permission_manager.register('maxplayers', 'Set the maximum players/spectators', app=self.app, min_level=2)
 		await self.instance.permission_manager.register('mode', 'Set the server game mode', app=self.app, min_level=2)
 		await self.instance.permission_manager.register('chat_toggle', 'Turn the public chat on or off', app=self.app, min_level=2)
 

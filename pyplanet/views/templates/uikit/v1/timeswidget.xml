@@ -4,13 +4,25 @@
   {% if times != None %}
     {% for time in times %}
       <frame pos="0 -{{ (loop.index0 * 3.25) }}">
-        <quad pos="4 0" z-index="0" size="0.25 3" bgcolor="{{ time.color }}"/>
-        <quad pos="0 0" z-index="0" size="4 3" bgcolor="00000090"/>
-        <label pos="2 -1.5" z-index="1" size="4 3" text="{{ time.index }}" textsize="0.3" textfont="RajdhaniMono"  textemboss="1" halign="center" valign="center2"/>
-        <quad pos="0 0" z-index="0" size="35 3" bgcolor="00000070"/>
-        <label pos="4.5 -1.5" z-index="1" size="20 3" text="{{ time.nickname }}" textfont="GameFontSemiBold" focusareacolor1="0000" focusareacolor2="0004" textsize="0.25" textemboss="0" halign="left" valign="center2"/>
-        <quad pos="25 0" z-index="0" size="10 3" bgcolor="00000070"/>
-        <label pos="30 -1.5" z-index="1" size="10 3" text="{{ time.score }}" textprefix="${{ time.color }}" textsize="0.2" textfont="RajdhaniMono"  textemboss="0" halign="center" valign="center2"/>
+      	<label pos="2 -1.5" z-index="4" size="4 3" text="{{time.index}}" valign="center2" textfont="RajdhaniMono" textprefix="$i$t" textsize="0.5" halign="center"/>
+				<label pos="4.5 -1.5" z-index="5" size="20 3" text="{{ time.nickname }}" textfont="RajdhaniMono" textsize="0.3" textemboss="1" halign="left" valign="center2"/>
+				<label pos="30 -1.5" z-index="3" size="10 3" text="{{ time.score }}" textsize="0.3" textfont="RajdhaniMono"  textemboss="1" halign="center" valign="center2"/>
+        {% if loop.index == 1 %}
+        <quad pos="4.25 -1.5"  size="35 3" image="file://Media/Painter/Stencils/15-Stripes/_Stripe0Grad/Brush.tga" halign="left" valign="center" z-index="1" modulatecolor="db0" />
+				<quad pos="0 0" z-index="2" size="4 3" bgcolor="db0"/>
+        {% endif %}
+        {% if loop.index == 2 %}
+        <quad pos="4.25 -1.5"  size="35 3" image="file://Media/Painter/Stencils/15-Stripes/_Stripe0Grad/Brush.tga" halign="left" valign="center" z-index="1" modulatecolor="aab" />
+				<quad pos="0 0" z-index="2" size="4 3" bgcolor="aab"/>
+        {% endif %}
+        {% if loop.index == 3 %}
+        <quad pos="4.25 -1.5"  size="35 3" image="file://Media/Painter/Stencils/15-Stripes/_Stripe0Grad/Brush.tga" halign="left" valign="center" z-index="1" modulatecolor="963" />
+				<quad pos="0 0" z-index="2" size="4 3" bgcolor="963"/>
+        {% endif %}
+        {% if loop.index > 3 %}
+        <quad pos="4.25 -1.5"  size="35 3" image="file://Media/Painter/Stencils/15-Stripes/_Stripe0Grad/Brush.tga" halign="left" valign="center" z-index="1" modulatecolor="000" opacity="0.8" />
+				<quad pos="0 0" z-index="2" size="4 3" bgcolor="000" />
+        {% endif %}
       </frame>
     {% endfor %}
   {% endif %}

@@ -3,6 +3,9 @@ from pyplanet.core.instance import Controller
 
 
 async def handle_map_begin(source, signal, **kwargs):
+	# Refresh the server info in the GBX client.
+	# await Controller.instance.gbx.refresh_info()
+
 	# Retrieve and update map, return it to our callback listeners.
 	#mapinfo = await Controller.instance.gbx('GetCurrentMapInfo')
 	#map = await Controller.instance.map_manager.handle_map_change(mapinfo)

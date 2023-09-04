@@ -1,12 +1,13 @@
 import asyncio
 import logging
 import os
+import re
 
 from xmlrpc.client import Fault
 from pyplanet.apps.core.maniaplanet.models import Player
 from pyplanet.core.ui.ui_properties import UIProperties
 from pyplanet.utils.log import handle_exception
-import lxml.etree as eTree
+import lxml.etree as etree
 
 logger = logging.getLogger(__name__)
 
@@ -100,12 +101,13 @@ class _BaseUIManager:
 
 				# Add manialink tag to body.
 				xml = '<manialink version="{}" id="{}" layer="{}" name="{}" attach="{}">{}</manialink>'.format(manialink.version, manialink.id, layer, name, attachid, body)
-				xml = xml.replace("<!--", "<![CDATA[").replace("-->", "]]>")
-				dom = eTree.XML(xml)
+				xml = re.sub("<script>\s*<\!--", "<script><![CDATA[", xml)
+				xml = re.sub("-->\s*<\/script>", "]]></script>", xml)
+				dom = etree.XML(xml)
 				dir = os.getcwd()
-				xslt = eTree.parse(dir+"/pyplanet/views/templates/uikit/v1/xlst.xml")
-				transform = eTree.XSLT(xslt)
-				body = eTree.tostring(transform(dom), pretty_print=True).decode()
+				xslt = etree.parse(dir+"/pyplanet/views/templates/uikit/v1/xlst.xml")
+				transform = etree.XSLT(xslt)
+				body = etree.tounicode(transform(dom))
 
 				# Prepare query
 				queries.append(self.instance.gbx(
@@ -123,12 +125,13 @@ class _BaseUIManager:
 
 			# Add manialink tag to body.
 			xml = '<manialink version="{}" id="{}" layer="{}" name="{}" override="{}">{}</manialink>'.format(manialink.version, manialink.id, layer, name, attachid, body)
-			xml = xml.replace("<!--", "<![CDATA[").replace("-->", "]]>")
-			dom = eTree.XML(xml)
+			xml = re.sub("<script>\s*<\!--", "<script><![CDATA[", xml)
+			xml = re.sub("-->\s*</script>", "]]></script>", xml)
+			dom = etree.XML(xml)
 			dir = os.getcwd()
-			xslt = eTree.parse(dir+"/pyplanet/views/templates/uikit/v1/xlst.xml")
-			transform = eTree.XSLT(xslt)
-			body = eTree.tostring(transform(dom), pretty_print=True).decode()
+			xslt = etree.parse(dir+"/pyplanet/views/templates/uikit/v1/xlst.xml")
+			transform = etree.XSLT(xslt)
+			body = etree.tounicode(transform(dom))
 
 			# Add normal queries.
 			if for_logins and len(for_logins) > 0:
