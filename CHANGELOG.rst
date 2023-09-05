@@ -1,8 +1,8 @@
 Changelog
 =========
 
-0.11.0-rc1
-----------
+0.11.0
+------
 
 Core
 ~~~~
@@ -12,6 +12,7 @@ Core
 * Improvement: Added :code:`name` attribute to ManiaLink tag, ensuring recognizability when debugging ManiaScript (thanks to w1lla) (#1213).
 
 * Bugfix: Fixing style stripper to be more realistic with in-game renderer (thanks to skybaks) (#1249).
+* Bugfix: Fixing issue with package aiohttp and incorrect required timeout package.
 
 Apps
 ~~~~
@@ -26,7 +27,6 @@ Apps
 * Improvement: Live Rankings no longer displays Rounds/Team/Cup standings in warm-up.
 
 * Bugfix: Fixing map info widget displaying author of the previous map by waiting for the map to be loaded (thanks to reaby) (#1191).
-* Bugfix: Fixing live rankings displaying invalid added points due to ping issues, by sorting finishes list on every finish (thanks to skybaks).
 * Bugfix: Fixing the reboot admin command on Windows machines (thanks to w1lla).
 * Bugfix: Fixing duplicate karma votes, by adding a unique constraint and removing the duplicate votes (#998).
 
