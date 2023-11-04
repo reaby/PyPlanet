@@ -1,4 +1,4 @@
-{% extends 'core.views/uikit/v1/generics/bootstrap.xml' %}
+{% extends 'core.views/uikit/v1/generics/bootstrap_widget.xml' %}
 
 {% block main %}
 <frame pos="{{ widget_x }} {{ widget_y }}" z-index="{{ z_index }}" data-sizex="{{size_x}}" data-sizey="{{size_y}}" id="Window" class="{% if distraction_hide %}distraction-hide{% endif %}">

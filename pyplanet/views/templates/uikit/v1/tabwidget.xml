@@ -1,4 +1,4 @@
-{% extends 'core.views/uikit/v1/generics/bootstrap.xml' %}
+{% extends 'core.views/uikit/v1/generics/bootstrap_widget.xml' %}
 
 {% block main %}
 <frame pos="{{ widget_x }} {{ widget_y }}" size="{{size_x}} {{size_y}}" z-index="550" id="Window"

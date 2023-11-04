@@ -43,7 +43,7 @@ DATABASES = {
 		'ENGINE': 'peewee_async.MySQLDatabase',
 		'NAME': str(os.environ.get("DB_NAME", "pyplanet")),
 		'OPTIONS': {
-			'host': str(os.environ.get("DB_HOST", "deb")),
+			'host': str(os.environ.get("DB_HOST", "dedicated")),
 			'user': str(os.environ.get("DB_USER", "pyplanet")),
 			'password': str(os.environ.get("DB_PASSWORD", "pyplanet")),
 			'charset': 'utf8mb4',
