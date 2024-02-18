@@ -53,7 +53,7 @@
     <!--#endregion-->
     <!--#region uiCheckbox definition-->
     <frame
-      pos="{@pos}" id="{@id}" class="uiContainer uiCheckbox uiCheckboxGroup {{group}}" data-checked="{@checked}"
+      pos="{@pos}" id="{@id}" class="uiContainer uiCheckbox uiCheckboxGroup {{@group}}" data-checked="{@checked}"
       data-disabled="{@disabled}">
       <entry pos="900 900" z-index="0" size="6 6" textemboss="1" text="1" textsize="3" valign="center2" halign="center"
              textformat="Basic" name="{@name}" scriptevents="1"/>

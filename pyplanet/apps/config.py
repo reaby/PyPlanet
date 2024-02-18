@@ -2,7 +2,6 @@ import inspect
 import importlib
 import logging
 import os
-
 from pyplanet.core.exceptions import ImproperlyConfigured, InvalidAppModule
 
 
