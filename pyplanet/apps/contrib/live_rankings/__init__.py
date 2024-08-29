@@ -45,6 +45,9 @@ class LiveRankings(AppConfig):
 
 	async def on_start(self):
 		# Init settings.
+		if self.instance.game.game == 'tmnext':
+			self.setting_nadeo_live_ranking.default = False
+
 		await self.context.setting.register(
 			self.setting_rankings_amount, self.setting_nadeo_live_ranking, self.setting_race_ranking
 		)
@@ -65,9 +68,14 @@ class LiveRankings(AppConfig):
 		# Make sure we move the multilap_info and disable the checkpoint_ranking and round_scores elements.
 		if self.instance.game.game in ['tm', 'sm']:
 			self.instance.ui_manager.properties.set_visibility('checkpoint_ranking', False)
-			self.instance.ui_manager.properties.set_visibility('round_scores', await self.setting_nadeo_live_ranking.get_value())
+			self.instance.ui_manager.properties.set_visibility('round_scores',
+															   await self.setting_nadeo_live_ranking.get_value())
 			self.instance.ui_manager.properties.set_attribute('round_scores', 'pos', '-126.5 80. 150.')
 			self.instance.ui_manager.properties.set_attribute('multilap_info', 'pos', '107., 88., 5.')
+		else:
+			self.instance.ui_manager.properties.set_visibility('Rounds_SmallScoresTable',
+															   await self.setting_nadeo_live_ranking.get_value())
+			await self.instance.ui_manager.properties.send_properties()
 
 		self.dedimania_enabled = ('dedimania' in self.instance.apps.apps and 'dedimania' not in self.instance.apps.unloaded_apps)
 
@@ -92,10 +100,12 @@ class LiveRankings(AppConfig):
 
 	async def nadeo_widget_change(self, *args, **kwargs):
 		if self.instance.game.game in ['tm', 'sm']:
-			self.instance.ui_manager.properties.set_visibility('round_scores', await self.setting_nadeo_live_ranking.get_value())
+			self.instance.ui_manager.properties.set_visibility('round_scores',
+															   await self.setting_nadeo_live_ranking.get_value())
 			await self.instance.ui_manager.properties.send_properties()
 		else:
-			self.instance.ui_manager.properties.set_visibility('Rounds_SmallScoresTable', await self.setting_nadeo_live_ranking.get_value())
+			self.instance.ui_manager.properties.set_visibility('Rounds_SmallScoresTable',
+															   await self.setting_nadeo_live_ranking.get_value())
 			await self.instance.ui_manager.properties.send_properties()
 
 	async def race_widget_change(self, *args, **kwargs):
@@ -117,15 +127,31 @@ class LiveRankings(AppConfig):
 				self.instance.ui_manager.properties.set_visibility('Rounds_SmallScoresTable', False)
 				await self.instance.ui_manager.properties.send_properties()
 			else:
-				self.instance.ui_manager.properties.set_visibility('Rounds_SmallScoresTable', await self.setting_nadeo_live_ranking.get_value())
+				self.instance.ui_manager.properties.set_visibility(
+					'Rounds_SmallScoresTable',
+					(await self.setting_nadeo_live_ranking.get_value()) or (await self.setting_race_ranking.get_value())
+				)
 				await self.instance.ui_manager.properties.send_properties()
+
+	def is_mode_rounds(self, mode):
+		mode = mode.lower()
+		return any(['rounds' in mode, 'team' in mode, 'cup' in mode, 'trackmania/tm_rounds_online' in mode,
+					'trackmania/tm_teams_online' in mode, 'trackmania/tm_cup_online' in mode,
+					mode == 'turborounds', mode == 'keklrounds2', mode == 'tm_roundskekl_online'])
+
+	def is_mode_ta(self, mode):
+		mode = mode.lower()
+		return any(['timeattack' in mode, 'trackmania/tm_timeattack_online' in mode])
 
 	def is_mode_supported(self, mode):
 		mode = mode.lower()
-		return mode.startswith('timeattack') or mode.startswith('rounds') or mode.startswith('team') or \
-			   mode.startswith('laps') or mode.startswith('cup') or mode.startswith('trackmania/tm_timeattack_online') or \
-			   mode.startswith('trackmania/tm_rounds_online') or mode.startswith('trackmania/tm_teams_online') or \
-			   mode.startswith('trackmania/tm_laps_online') or mode.startswith('trackmania/tm_cup_online')
+		return any([
+			mode == 'turborounds', mode == 'keklrounds2', mode == 'tm_roundskekl_online',
+			mode.startswith('timeattack'), mode.startswith('rounds'), mode.startswith('team'),
+			mode.startswith('laps'), mode.startswith('cup'), mode.startswith('trackmania/tm_timeattack_online'),
+			mode.startswith('trackmania/tm_rounds_online'), mode.startswith('trackmania/tm_teams_online'),
+			mode.startswith('trackmania/tm_laps_online'), mode.startswith('trackmania/tm_cup_online')
+		])
 
 	async def scores(self, section, players, **kwargs):
 		if section == 'PreEndRound':
@@ -141,7 +167,7 @@ class LiveRankings(AppConfig):
 		self.current_finishes = []
 
 		current_script = (await self.instance.mode_manager.get_current_script()).lower()
-		if 'timeattack' in current_script or 'trackmania/tm_timeattack_online' in current_script:
+		if self.is_mode_ta(current_script):
 			for player in players:
 				if 'best_race_time' in player:
 					if player['best_race_time'] != -1:
@@ -153,8 +179,7 @@ class LiveRankings(AppConfig):
 						self.current_rankings.append(new_ranking)
 
 			self.current_rankings.sort(key=lambda x: x['score'])
-		elif 'rounds' in current_script or 'team' in current_script or 'cup' in current_script or \
-			'trackmania/tm_rounds_online' in current_script or 'trackmania/tm_teams_online' in current_script or 'trackmania/tm_cup_online' in current_script:
+		elif self.is_mode_rounds(current_script):
 			for player in players:
 				if 'map_points' in player:
 					if player['map_points'] != -1:

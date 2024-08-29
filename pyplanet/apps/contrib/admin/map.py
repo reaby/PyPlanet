@@ -88,10 +88,13 @@ class MapAdmin:
             .add_param('seconds', required=False, type=int, help='Extend the TA limit with given seconds.'),
         )
 
-        # If jukebox app is loaded, register the map actions.
-        if 'jukebox' in self.instance.apps.apps:
-            from pyplanet.apps.contrib.jukebox.views import MapListView
-            MapListView.add_action(self.list_action_remove, 'Delete', '&#xf1f8;', class_name="danger")
+		# If jukebox app is loaded, register the map actions.
+		if 'jukebox' in self.instance.apps.apps:
+			from pyplanet.apps.contrib.jukebox.views import MapListView
+			MapListView.add_action(self.list_action_remove, 'Delete', '&#xf1f8;',
+								   min_level=(
+									   await self.instance.permission_manager.get_perm(self.app.label, 'remove_map')
+								   ).min_level)
 
     async def list_action_remove(self, player, values, map_dictionary, view, **kwargs):
         # Check permission.
@@ -297,10 +300,10 @@ class MapAdmin:
                     if map_instance:
                         self.instance.apps.apps['jukebox'].insert_map(player, map_instance)
 
-        except Exception as e:
-            logger.warning('Error when player {} was adding map from local disk: {}'.format(player.login, str(e)))
-            message = '$ff0Error: Can\'t add map, Error: {}'.format(str(e))
-            await self.instance.chat(message, player.login)
+		except Exception as e:
+			logger.warning('Error when player {} was adding map from local disk: {}'.format(player.login, str(e)))
+			message = '$ff0Error: Can\'t add map, Error: {}'.format(str(e))
+			await self.instance.chat(message, player.login)
 
     async def erase_map(self, player, data, **kwargs):
         kwargs['erase'] = True
