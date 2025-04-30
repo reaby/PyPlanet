@@ -7,187 +7,188 @@ logger = logging.getLogger(__name__)
 
 
 class ModeManager(CoreContrib):
-	"""
-	Mode Manager manges the script, script settings and the mode UI settings of the current game mode.
+    """
+    Mode Manager manges the script, script settings and the mode UI settings of the current game mode.
 
-	.. warning::
+    .. warning::
 
-		Don't initiate this class yourself. Use ``instance.mode_manager`` for an static instance.
+        Don't initiate this class yourself. Use ``instance.mode_manager`` for an static instance.
 
-	"""
-	def __init__(self, instance):
-		"""
-		Initiate, should only be done from the core instance.
+    """
 
-		:param instance: Instance.
-		:type instance: pyplanet.core.instance.Instance
-		"""
-		self._instance = instance
+    def __init__(self, instance):
+        """
+        Initiate, should only be done from the core instance.
 
-		self._current_script = None
-		self._next_script = None
-		self._current_full_script = None
-		self._next_full_script = None
+        :param instance: Instance.
+        :type instance: pyplanet.core.instance.Instance
+        """
+        self._instance = instance
 
-		self._next_settings_update = dict()
-		self._next_variables_update = dict()
+        self._current_script = None
+        self._next_script = None
+        self._current_full_script = None
+        self._next_full_script = None
 
-	async def on_start(self):
-		"""
-		Handle startup, just before the apps will start. We will make sure we are ready to get requests for permissions.
-		"""
-		self._current_script = await self.get_current_script(refresh=True)
+        self._next_settings_update = dict()
+        self._next_variables_update = dict()
 
-		# Listeners.
-		self._instance.signals.listen('maniaplanet:server_start', self._on_change)
+    async def on_start(self):
+        """
+        Handle startup, just before the apps will start. We will make sure we are ready to get requests for permissions.
+        """
+        self._current_script = await self.get_current_script(refresh=True)
 
-	async def _on_change(self, *args, **kwargs):
-		# Making sure we set the settings + variables.
-		if len(self._next_settings_update.keys()) > 0:
-			logger.debug('Setting mode settings right now!')
-			try:
-				await self.update_settings(self._next_settings_update)
-			except Exception as e:
-				logging.error('Can\'t set the script mode settings! Error: {}'.format(str(e)))
-			self._next_settings_update = dict()
-		if len(self._next_variables_update.keys()) > 0:
-			logger.debug('Setting mode variables right now!')
-			try:
-				await self.update_variables(self._next_variables_update)
-			except Exception as e:
-				logging.error('Can\'t set the script mode variables! Error: {}'.format(str(e)))
-			self._next_variables_update = dict()
+        # Listeners.
+        self._instance.signals.listen('maniaplanet:server_start', self._on_change)
 
-		# Make sure we send to the signal when mode is been changed.
-		if self._current_script != self._next_script:
-			await script_mode_changed.send_robust({
-				'unloaded_script': self._current_script, 'loaded_script': self._next_script
-			})
+    async def _on_change(self, *args, **kwargs):
+        # Making sure we set the settings + variables.
+        if len(self._next_settings_update.keys()) > 0:
+            logger.debug('Setting mode settings right now!')
+            try:
+                await self.update_settings(self._next_settings_update)
+            except Exception as e:
+                logging.error('Can\'t set the script mode settings! Error: {}'.format(str(e)))
+            self._next_settings_update = dict()
+        if len(self._next_variables_update.keys()) > 0:
+            logger.debug('Setting mode variables right now!')
+            try:
+                await self.update_variables(self._next_variables_update)
+            except Exception as e:
+                logging.error('Can\'t set the script mode variables! Error: {}'.format(str(e)))
+            self._next_variables_update = dict()
 
-		await self.get_current_script(refresh=True)
+        # Make sure we send to the signal when mode is been changed.
+        if self._current_script != self._next_script:
+            await script_mode_changed.send_robust({
+                'unloaded_script': self._current_script, 'loaded_script': self._next_script
+            })
 
-	async def get_current_script(self, refresh=False):
-		"""
-		Get the current script name.
+        await self.get_current_script(refresh=True)
 
-		:param refresh: Refresh from server.
-		"""
-		if refresh or not self._current_script:
-			payload = await self._instance.gbx('GetScriptName')
-			current_value = payload['CurrentValue'].partition('.')[0]
-			if '\\' in current_value:
-				current_value = current_value.rpartition('\\')[2]
-			self._current_script = current_value
-			self._current_full_script = payload['CurrentValue']
+    async def get_current_script(self, refresh=False):
+        """
+        Get the current script name.
 
-			if 'NextValue' in payload:
-				next_value = payload['NextValue'].partition('.')[0]
-				if '\\' in next_value:
-					next_value = next_value.rpartition('\\')[2]
-				self._next_script = next_value
-				self._next_full_script = payload['NextValue']
+        :param refresh: Refresh from server.
+        """
+        if refresh or not self._current_script:
+            payload = await self._instance.gbx('GetScriptName')
+            current_value = payload['CurrentValue'].partition('.')[0]
+            if '\\' in current_value:
+                current_value = current_value.rpartition('\\')[2]
+            self._current_script = current_value
+            self._current_full_script = payload['CurrentValue']
 
-		return self._current_script
+            if 'NextValue' in payload:
+                next_value = payload['NextValue'].partition('.')[0]
+                if '\\' in next_value:
+                    next_value = next_value.rpartition('\\')[2]
+                self._next_script = next_value
+                self._next_full_script = payload['NextValue']
 
-	async def get_next_script(self, refresh=False):
-		"""
-		Get the next script name.
+        return self._current_script
 
-		:param refresh: Refresh from server.
-		"""
-		await self.get_current_script(refresh=refresh)
-		return self._next_script
+    async def get_next_script(self, refresh=False):
+        """
+        Get the next script name.
 
-	async def get_current_full_script(self, refresh=False):
-		"""
-		Get the current full script name.
+        :param refresh: Refresh from server.
+        """
+        await self.get_current_script(refresh=refresh)
+        return self._next_script
 
-		:param refresh: Refresh from server.
-		"""
-		if refresh or not self._current_full_script:
-			await self.get_current_script(True)
+    async def get_current_full_script(self, refresh=False):
+        """
+        Get the current full script name.
 
-		return self._current_full_script
+        :param refresh: Refresh from server.
+        """
+        if refresh or not self._current_full_script:
+            await self.get_current_script(True)
 
-	async def get_next_full_script(self, refresh=False):
-		"""
-		Get the next full script name.
+        return self._current_full_script
 
-		:param refresh: Refresh from server.
-		"""
-		if refresh or not self._next_full_script:
-			await self.get_current_script(True)
+    async def get_next_full_script(self, refresh=False):
+        """
+        Get the next full script name.
 
-		return self._next_full_script
+        :param refresh: Refresh from server.
+        """
+        if refresh or not self._next_full_script:
+            await self.get_current_script(True)
 
-	async def get_current_script_info(self):
-		"""
-		Get the script info as a structure containing: Name, CompatibleTypes, Description, Version and the settings available.
-		"""
-		return await self._instance.gbx('GetModeScriptInfo')
+        return self._next_full_script
 
-	async def set_next_script(self, name):
-		"""
-		Set the next played script name (after map restart/skip).
+    async def get_current_script_info(self):
+        """
+        Get the script info as a structure containing: Name, CompatibleTypes, Description, Version and the settings available.
+        """
+        return await self._instance.gbx('GetModeScriptInfo')
 
-		:param name: Name
-		"""
-		await self._instance.gbx('SetScriptName', name)
-		name = name.partition('.')[0]
-		if '\\' in name:
-			name = name.rpartition('\\')[2]
-		self._next_script = name
+    async def set_next_script(self, name):
+        """
+        Set the next played script name (after map restart/skip).
 
-	async def get_settings(self):
-		"""
-		Get the current mode settings as a dictionary.
-		"""
-		return await self._instance.gbx('GetModeScriptSettings')
+        :param name: Name
+        """
+        await self._instance.gbx('SetScriptName', name)
+        name = name.partition('.')[0]
+        if '\\' in name:
+            name = name.rpartition('\\')[2]
+        self._next_script = name
 
-	async def update_settings(self, update_dict):
-		"""
-		Update the current settings, merges current settings with the provided settings. Replaces by the keys you give
-		if the data already exists.
+    async def get_settings(self):
+        """
+        Get the current mode settings as a dictionary.
+        """
+        return await self._instance.gbx('GetModeScriptSettings')
 
-		:param update_dict: The dictionary with the partial updated keys and values.
-		"""
-		current_settings = await self.get_settings()
-		current_settings.update(update_dict)
-		await self._instance.gbx('SetModeScriptSettings', current_settings)
+    async def update_settings(self, update_dict):
+        """
+        Update the current settings, merges current settings with the provided settings. Replaces by the keys you give
+        if the data already exists.
 
-	async def update_next_settings(self, update_dict):
-		"""
-		Queue setting changes for the next script (that will be active after restart).
+        :param update_dict: The dictionary with the partial updated keys and values.
+        """
+        current_settings = await self.get_settings()
+        current_settings.update(update_dict)
+        await self._instance.gbx('SetModeScriptSettings', current_settings)
 
-		:param update_dict: The dictionary with the partial updated keys and values.
-		"""
-		if not isinstance(self._next_settings_update, dict):
-			self._next_settings_update = dict()
-		self._next_settings_update.update(update_dict)
+    async def update_next_settings(self, update_dict):
+        """
+        Queue setting changes for the next script (that will be active after restart).
 
-	async def get_variables(self):
-		"""
-		Get the mode script variables.
-		"""
-		return await self._instance.gbx('GetModeScriptVariables')
+        :param update_dict: The dictionary with the partial updated keys and values.
+        """
+        if not isinstance(self._next_settings_update, dict):
+            self._next_settings_update = dict()
+        self._next_settings_update.update(update_dict)
 
-	async def update_variables(self, update_dict):
-		"""
-		Update the current variables, merges current vars with the provided vars. Replaces by the keys you give
-		if the data already exists.
+    async def get_variables(self):
+        """
+        Get the mode script variables.
+        """
+        return await self._instance.gbx('GetModeScriptVariables')
 
-		:param update_dict: The dictionary with the partial updated keys and values.
-		"""
-		variables = await self.get_variables()
-		variables.update(update_dict)
-		await self._instance.gbx('SetModeScriptVariables', variables)
+    async def update_variables(self, update_dict):
+        """
+        Update the current variables, merges current vars with the provided vars. Replaces by the keys you give
+        if the data already exists.
 
-	async def update_next_variables(self, update_dict):
-		"""
-		Queue variable changes for the next script (that will be active after restart).
+        :param update_dict: The dictionary with the partial updated keys and values.
+        """
+        variables = await self.get_variables()
+        variables.update(update_dict)
+        await self._instance.gbx('SetModeScriptVariables', variables)
 
-		:param update_dict: The dictionary with the partial updated keys and values.
-		"""
-		if not isinstance(self._next_variables_update, dict):
-			self._next_variables_update = dict()
-		self._next_variables_update.update(update_dict)
+    async def update_next_variables(self, update_dict):
+        """
+        Queue variable changes for the next script (that will be active after restart).
+
+        :param update_dict: The dictionary with the partial updated keys and values.
+        """
+        if not isinstance(self._next_variables_update, dict):
+            self._next_variables_update = dict()
+        self._next_variables_update.update(update_dict)

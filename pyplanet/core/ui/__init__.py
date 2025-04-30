@@ -11,6 +11,7 @@ import lxml.etree as etree
 
 logger = logging.getLogger(__name__)
 
+
 class _BaseUIManager:
     def __init__(self, instance):
         """
@@ -126,10 +127,12 @@ class _BaseUIManager:
             # Add manialink tag to body.
             xml = '<manialink version="{}" id="{}" layer="{}" name="{}" override="{}">{}</manialink>'.format(
                 manialink.version, manialink.id, layer, name, attachid, body)
-            xml = re.sub("<script>\s*<\!--", "<script><![CDATA[", xml)
+            xml = re.sub("<script>\s*<!--", "<script><![CDATA[", xml)
             xml = re.sub("-->\s*</script>", "]]></script>", xml)
-            dom = etree.XML(xml)
+
+            dom = etree.fromstring(xml)
             dir = os.getcwd()
+
             xslt = etree.parse(dir + "/pyplanet/views/templates/uikit/v1/xlst.xml")
             transform = etree.XSLT(xslt)
             body = etree.tounicode(transform(dom))

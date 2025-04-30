@@ -30,7 +30,7 @@ class JukeboxListView(ManualListView):
 		self.manager = app.context.ui
 
 	async def get_fields(self):
-		return [
+		fields = [
 			{
 				'name': '#',
 				'index': 'index',
@@ -48,14 +48,27 @@ class JukeboxListView(ManualListView):
 				'type': 'label',
 				# 'action': self.action_drop
 			},
-			{
-				'name': 'Requested by',
-				'index': 'player_nickname',
+		]
+
+		if len(set([m.environment for m in self.app.instance.map_manager.maps])) > 1:
+			fields.append({
+				'name': 'Env.',
+				'index': 'environment',
 				'sorting': True,
 				'searching': False,
-				'width': 50
-			},
-		]
+				'type': 'label',
+				'width': 20,
+			})
+
+		fields.append({
+			'name': 'Requested by',
+			'index': 'player_nickname',
+			'sorting': True,
+			'searching': False,
+			'width': 50
+		})
+
+		return fields
 
 	async def get_actions(self):
 		if self.player and self.player.level > 0:
@@ -142,8 +155,8 @@ class JukeboxListView(ManualListView):
 		index = 1
 		items = []
 		for item in self.app.jukebox:
-			items.append({'index': index, 'map_name': item['map'].name, 'player_nickname': item['player'].nickname,
-						  'player_login': item['player'].login})
+			items.append({'index': index, 'map_name': item['map'].name, 'environment': item['map'].environment,
+						  'player_nickname': item['player'].nickname, 'player_login': item['player'].login})
 			index += 1
 
 		return items
@@ -229,7 +242,7 @@ class MapListView(ManualListView):
 				'sorting': True,
 				'searching': True,
 				'search_strip_styles': True,
-				'width': 80,
+				'width': 90,
 				'type': 'label',
 				'action': self.action_jukebox
 			},
@@ -243,6 +256,16 @@ class MapListView(ManualListView):
 				'width': 45,
 			},
 		]
+
+		if len(set([m.environment for m in self.app.instance.map_manager.maps])) > 1:
+			fields.append({
+				'name': 'Env.',
+				'index': 'environment',
+				'sorting': True,
+				'searching': False,
+				'type': 'label',
+				'width': 20,
+			})
 
 		if self.player.level > 1:
 			fields.insert(0, {
@@ -288,7 +311,8 @@ class MapListView(ManualListView):
 					'sorting': True,
 					'searching': False,
 					'width': 15,
-					'renderer': render_karma
+					'renderer': render_karma,
+					'action': self.action_whokarma
 				})
 
 			if 'local_records' in self.app.instance.apps.apps:
@@ -297,7 +321,7 @@ class MapListView(ManualListView):
 					'index': 'local_record_rank',
 					'sorting': True,
 					'searching': False,
-					'width': 15,
+					'width': 10,
 					'renderer': render_rank
 				})
 				fields.append({
@@ -380,6 +404,10 @@ class MapListView(ManualListView):
 				await self.app.instance.command_manager.execute(player, '//remove {}'.format(self.objects[row]['id']))
 		self.cache = list()
 		await self.display(player=self.player)
+
+	async def action_whokarma(self, player, values, map_info, **kwargs):
+		if 'karma' in self.app.instance.apps.apps:
+			await self.app.instance.apps.apps['karma'].show_karma_list(player, await self.app.instance.map_manager.get_map(map_info['uid']))
 
 	async def action_folders(self, player, values, **kwargs):
 		await self.app.folder_manager.display_folder_list(player)

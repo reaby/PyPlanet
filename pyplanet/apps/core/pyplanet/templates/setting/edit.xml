@@ -25,8 +25,8 @@
     {% if setting.type == types.str or setting.type == types.int or setting.type == types.float or setting.type ==
     types.dict %}
     <label pos="0 0" size="30 5" text="$fff$oValue" textsize="1.2" valign="top"/>
-    <entry pos="30 0" size="70 40" name="setting_value_field" id="setting_value_field"
-           textsize="1.2" default="{{ setting_value|default('', True) }}" scriptevents="1"
+    <textedit pos="30 0" size="70 40" name="setting_value_field" id="setting_value_field"
+           textsize="1.2" default="{{ setting_value|default('', True)|replace("\n", "&#10;")|safe }}" scriptevents="1"
            focusareacolor1="" focusareacolor2=""/>
     {% elif setting.type == types.bool %}
      <Checkbox pos="30 0" size="30 5" text="Enable/Activated" name="setting_value_field"
@@ -35,7 +35,7 @@
         <frame id="setting_value_list">
           <textedit pos="10 -10" size="90 40" name="setting_value_field" id="setting_value_field"
                     textsize="1.2" scriptevents="1" maxline="1024" autonewline="1"
-                    default="{% if setting_value %}{{ setting_value|join("\n") }}{% else %}{% endif %}"
+                    default="{% if setting_value %}{{ setting_value|join('&#10;')|safe }}{% else %}{% endif %}"
                     showlinenumbers="1" />
           <label pos="50 -3" size="100 5" text="$fffEvery line represents one entry" textsize="1.2" halign="center" valign="top" />
         </frame>

@@ -348,6 +348,28 @@ Functionality:
 Required permission:
   ``admin:points_repartition``, requires admin level 2.
 
+Pause running round
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Command:
+  ``//pause``
+Parameters:
+  None
+Functionality:
+  Skips the running round and pauses the match until an admin resumes the match
+Required permission:
+  ``admin:pause``, requires admin level 2.
+
+End running pause
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Command:
+  ``//unpause`` / ``//endpause`` / ``//resume``
+Parameters:
+  None
+Functionality:
+  Ends the running pause and resumes the match
+Required permission:
+  ``admin:pause``, requires admin level 2.
+
 Write Blacklist
 ~~~~~~~~~~~~~~~
 Command:
@@ -434,7 +456,7 @@ Set game mode
 Command:
   ``//mode``
 Parameters:
-  * Game mode 'ta', 'laps', 'rounds', 'cup' or any script name (e.g. 'Rounds.Script.txt')
+  * Game mode 'ta', 'timeattack', 'laps', 'rounds', 'cup', 'team', 'teams', 'ko', 'knockout', 'champion', 'royal', 'stunt', 'platform' or any script name (e.g. 'Rounds.Script.txt')
 Functionality:
   Changes the server game mode script.
 Required permission:

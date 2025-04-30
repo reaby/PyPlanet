@@ -1,7 +1,7 @@
 import asyncio
 
 from pyplanet.apps.config import AppConfig
-from pyplanet.apps.contrib.local_records.views import LocalRecordsListView, LocalRecordsWidget
+from pyplanet.apps.contrib.local_records.views import LocalRecordsListView, LocalRecordsWidget, LocalRecordCpCompareListView
 from pyplanet.apps.core.maniaplanet.models import Player
 from pyplanet.contrib.command import Command
 from pyplanet.contrib.setting import Setting
@@ -44,10 +44,8 @@ class LocalRecords(AppConfig):
 			Command(command='records', target=self.show_records_list,
 					description='Displays the complete list of local records on the current map.'),
 			Command(
-				'localcps', target=self.command_localcps,
-				description='Compares your local record checkpoints with another record.'
-			).add_param('record', required=False, type=int, help='Custom record rank to compare with. Defaults to 1.',
-						default=1)
+				'localcps', target=self.command_localcps, description='Compares your local record checkpoints with another record.'
+			).add_param('record', required=False, type=int, help='Custom record rank to compare with. Defaults to 1.', default=1)
 		)
 
 		# Register signals
@@ -131,6 +129,10 @@ class LocalRecords(AppConfig):
 			)
 
 			# Group by map.
+			# Make sure all maps have an entry in the dictionary.
+			for list_map_id in maps:
+				map_locals[list_map_id] = list()
+
 			for row in rows:
 				if row.map_id not in map_locals:
 					map_locals[row.map_id] = list()
@@ -292,9 +294,7 @@ class LocalRecords(AppConfig):
 			new_index = self.current_records.index(current_record) + 1
 
 			if new_index == 1:
-				map = next(
-					(m for m in self.instance.map_manager.maps if m.uid == self.instance.map_manager.current_map.uid),
-					None)
+				map = next((m for m in self.instance.map_manager.maps if m.uid == self.instance.map_manager.current_map.uid), None)
 				if map is not None:
 					map.local = {'record_count': len(self.current_records), 'first_record': current_record}
 
@@ -400,10 +400,10 @@ class LocalRecords(AppConfig):
 
 			compare_record = self.current_records[data.record - 1]
 
-			record_index = self.current_records.index(record[0]) if len(record) else None
-			compare_index = self.current_records.index(compare_record)
+			record_index = (self.current_records.index(record[0]) + 1) if len(record) else None
+			compare_index = (self.current_records.index(compare_record) + 1)
 
-		view = views.LocalRecordCpCompareListView(
+		view = LocalRecordCpCompareListView(
 			self, record[0] if len(record) else None, record_index, compare_record, compare_index
 		)
 		await view.display(player)
